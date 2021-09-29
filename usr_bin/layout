@@ -1,0 +1,8 @@
+#!/bin/bash
+
+LAYOUT=`ls ~/*.layout | dmenu -p "Select layout:"`
+if [[ -n "$LAYOUT" ]]
+then
+    # echo $LAYOUT
+    i3-msg "append_layout "$LAYOUT
+fi

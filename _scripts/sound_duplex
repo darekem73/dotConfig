@@ -1,0 +1,2 @@
+#!/bin/bash
+pacmd set-card-profile alsa_card.pci-0000_03_00.6 output:analog-stereo+input:analog-stereo

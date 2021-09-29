@@ -1,0 +1,22 @@
+Config {  
+        -- font = "xft:Monospace:pixelsize=11"
+        font = "xft:DejaVuSansMono:pixelsize=12"
+        , bgColor = "#101010"
+        -- , fgColor = "grey"
+        -- , position = TopW L 94
+        , lowerOnStart = True
+        , commands = [ 
+            -- Run Cpu ["-t","Cpu: <total>","-L","3","-H","50","--normal","green","--high","red"] 20
+            -- , Run Memory ["-t","Mem: <usedratio>%","-L","40","-H","80","-l","green","-n","orange","-h","red"] 20
+	    -- , Run Swap [] 100
+	    -- , Run DiskU [("/", "<free>/<size>"), ("sda6", "<free>/<size>")]
+            --             ["-L", "20", "-H", "50", "-m", "1", "-p", "3"]
+            --             100
+            Run Date "%a %Y-%m-%d %H:%M" "date" 100
+            , Run StdinReader
+        ]
+        , sepChar = "%"
+        , alignSep = "}{"
+	-- , template = "%StdinReader% }{ %cpu% | %memory% * %swap% | %disku% | <fc=#ee9a00>%date%</fc>"
+	, template = "%StdinReader% }{ <fc=#ee9a00>%date%</fc> "
+}

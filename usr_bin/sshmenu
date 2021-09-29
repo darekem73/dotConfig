@@ -1,0 +1,37 @@
+#!/bin/bash
+dir=~/.scripts/connections/
+cmd=`find $dir -type f -printf "%P\n" | grep -v "json" | dmenu -i -l 20`
+
+function extract_sesion_options() {
+	config=$1
+	tmux_config_file="--config-file=$(cat $config|jq '.config'|tr -d '"')"
+	working_directory="$(cat $config|jq '.dir'|tr -d '"')"
+}
+
+if [ -n "$cmd" ]; then
+	comm="--command=$dir$cmd"
+	session_options=$dir$cmd.json
+	if [ -f $session_options ]; then
+		extract_sesion_options "$session_options"
+	else
+		group_options=$(dirname "$dir$cmd")/config.json
+		if [ -f $group_options ]; then
+			extract_sesion_options "$group_options"
+		else
+			common_options=$dir/config.json
+			if [ -f $common_options ]; then
+				extract_sesion_options "$common_options"
+			else
+				[ -f $HOME/.tmux-logged.conf ] && tmux_config_file="--config-file=$HOME/.tmux-logged.conf"
+				working_directory="$HOME/"
+			fi
+		fi
+	fi
+	#echo $comm
+	#echo $tmux_config_file
+	#echo $working_directory
+	[ -n $working_directory ] && cd $working_directory
+	#st -e $HOME/.scripts/tmux-logged.sh $comm $tmux_config_file
+	alacritty --command $HOME/.scripts/tmux-logged.sh $comm $tmux_config_file
+	#kitty $HOME/.scripts/tmux-logged.sh $comm $tmux_config_file
+fi

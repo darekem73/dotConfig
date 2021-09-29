@@ -1,0 +1,3 @@
+:def hoogle \x -> return $ ":!hoogle \"" ++ x ++ "\""
+:def hoogle \x -> return $ ":!hoogle \"" ++ x ++ "\""
+:set prompt "λ> "

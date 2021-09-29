@@ -1,0 +1,74 @@
+Config {  
+        -- font = "xft:Monospace:pixelsize=11"
+        -- font = "xft:DejaVuSansMono:pixelsize=12:antialias=true:hinting=true"
+        font = "xft:DejaVuSansMono:pixelsize=11:antialias=true:hinting=true"
+        -- font = "xft:FreeMono:style=Bold:pixelsize=12"
+        -- font = "xft:FreeMono:style=Bold:size=10"
+        , bgColor = "#101010"
+        -- , fgColor = "grey"
+        -- , position = TopW L 94
+        , lowerOnStart = True
+       , commands = [ 
+           -- Run MultiCpu ["-L","25","-H","75","--low","green","--normal","yellow","--high","red","-t","<total>% <autovbar>"] 20
+           Run Network "tun1" ["-t","t:[<rx>/<tx>]"] 10
+           , Run Network "wlan0" ["-t","w:[<rx>/<tx>]"] 10
+           , Run Network "eth0" ["-t","e:[<rx>/<tx>]"] 10
+           , Run Wireless "wlan0" ["-t", "<essid> <quality>", "-L", "30", "-H", "70",
+             "-l", "red", "-n","yellow", "-h", "green"] 20
+           , Run Cpu ["-t","Cpu:<total>%","-L","3","-H","50","--normal",
+               "green","--high","red"] 20
+           -- , Run CpuFreq ["-t","Freq: <cpu0>/<cpu1> GHz","-L","0","-H","2"
+           --    ,"-l","lightblue","-n","white","-h","red"] 10
+           , Run Memory ["-t","Mem:<usedratio>%","-L","40","-H","80"
+                 ,"-l","green","-n","orange","-h","red"] 20
+           -- , Run Swap ["-t","Swp:<usedratio>%","-L","10","-H","30"
+           --       ,"-n","orange","-h","red"] 100
+           , Run DiskU [("/", "/<free>"), ("/home", "/H:<free>")]
+                       ["-L", "20", "-H", "50", "-m", "1", "-p", "3"]
+                       100
+           , Run Date "%a %Y-%m-%d %H:%M" "date" 100
+           -- , Run StdinReader
+           , Run UnsafeStdinReader
+           , Run Battery    [ "--template" , "<acstatus>"
+                            , "--Low"      , "10"        -- units: %
+                            , "--High"     , "80"        -- units: %
+                            , "--low"      , "darkred"
+                            , "--normal"   , "darkorange"
+                            , "--high"     , "darkgreen"
+                            , "--" -- battery specific options
+                                      -- discharging status
+                                      , "-o"	, "<left>% (<timeleft>)"
+                                      -- AC "on" status
+                                      -- , "-O"	, "<fc=#dAA520>Charging</fc> (<left>%)"
+                                      , "-O"	, "<fc=#dAA520>+</fc>(<left>%)"
+                                      -- charged status
+                                      -- , "-i"	, "<fc=#006000>Charged</fc>"
+                                      , "-i"	, "<fc=#006000>Full</fc>"
+                            ] 100
+           --, Run Alsa "default" "Master" ["-t", "<volume>% <status>]
+           , Run Alsa "default" "Master" ["-t", "<volume> <status>"
+                                         , "--" 
+                                              , "--on", "●"
+                                              , "--off", "●"
+                                         ]
+           , Run Alsa "default" "Capture" ["-t", "<status>"
+                                         , "--" 
+                                              , "--on", "●"
+                                              , "--off", "●"
+                                         ]
+           -- , Run Com "dcop" ["kxkb", "kxkb", "getCurrentLayout"] "kbd" 20
+           -- , Run Com "/bin/bash" ["-c", "echo `xbacklight -get | grep -oE '^.[0-9]{0,3}'`%"] "mybright" 10
+           -- , Run Com "/usr/local/bin/getvol" [] "Vol" 10
+           -- , Run Com "/usr/local/bin/gwaddress" [] "gw" 20
+           , Run Com "/usr/local/bin/netdiag" [] "net" 20
+       ]
+       , sepChar = "%"
+       , alignSep = "}{"
+       -- , template = "<fc=#ff66ff>%date%</fc> %LGAV% } %StdinReader% { %wlan0% | %cpu% | %memory%" 
+       -- , template = "%StdinReader% }{ ☀ %mybright% | %tun1% | %wlan0% %wlan0wi% | %gw% | %net% | %cpu% | %memory% * %swap% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>"
+       -- , template = "%StdinReader% }{ <fc=#ff66ff>%tun1%</fc> | ♫ %Vol% | ☀ %mybright% | %wlan0% | %wlan0wi% | %eth0% | %gw% | %net% | %cpu% | %memory% * %swap% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>"
+       -- , template = "%UnsafeStdinReader% }{ <fc=#ff66ff>%tun1%</fc> | ♫ %Vol% | ☀ %mybright% | %wlan0% | %wlan0wi% | %eth0% | %gw% | %net% | %cpu% | %memory% * %swap% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>"
+       -- , template = "%StdinReader% }{ <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %eth0% | %net% | %cpu% | %memory% * %swap% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>"
+       -- , template = "%UnsafeStdinReader% }{ %alsa:default:Master%/%alsa:default:Capture% | <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %eth0% | %net% | %cpu% | %memory% %swap% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>"
+       , template = "%UnsafeStdinReader% }{ ♫ %alsa:default:Master%/%alsa:default:Capture% | <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %eth0% | %net% | %cpu% | %memory% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>"
+}

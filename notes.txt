@@ -1,0 +1,34 @@
+USB MODESWITCH HUAWEI
+sudo usb_modeswitch -v 12d1 -p 1f01 -J
+lsusb
+
+# for zoom and viber
+# export QT_SCALE_FACTOR=0.5
+
+# enable reisub
+echo "kernel.sysrq = 1" >> /etc/sysctl.d/99-sysctl.conf
+
+# set proper mime-types after installing wps
+xdg-mime query default $(xdg-mime query filetype "`find ./ -iname "*.drawio" 2>/dev/null | head -1`")
+xdg-mime default org.pwmt.zathura.desktop $(xdg-mime query filetype "`find ./ -iname "*.pdf" 2>/dev/null | head -1`")
+
+# rebuild database of installed .desktop apps
+sudo update-desktop-database
+
+# after creating new mime type in /usr/share/mime/packages rebuild mime-types database
+sudo update-mime-database /usr/share/mime
+
+# clear disk caches
+sudo /sbin/sysctl -w vm.drop_caches=3
+
+# enable systemd persistent storage
+ the journal storage defaults to being in-memory. You can change the default to be persistent by opening /etc/systemd/journald.conf and changing the Storage= line from auto to persistent. You may need to restart journald by systemctl restart systemd-journald after the config file edit.
+
+# enable REISUB
+echo "kernel.sysrq = 1" >> /etc/sysctl.d/99-sysctl.conf
+
+# repair xdg-open url -> thunderbird
+xdg-settings set default-url-scheme-handler http firefox.desktop
+xdg-mime default firefox.desktop x-scheme-handler/http
+xdg-mime default firefox.desktop x-scheme-handler/https
+

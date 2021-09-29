@@ -1,0 +1,4 @@
+#!/bin/bash
+MODE=$(echo -e "single\nsame\nextend" | dmenu -l 3 -p "Set monitor mode?")
+[[ "$MODE" != "" ]] && monitor $MODE
+

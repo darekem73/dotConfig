@@ -1,0 +1,3 @@
+#!/bin/bash
+sel=`find ~/.password-store/ -type f -iname "*.gpg" -printf "%P\n" | sed 's/.gpg//' | sort -r | dmenu -l 10`
+[[ $sel != "" ]] && pass -c $sel

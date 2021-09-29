@@ -1,0 +1,1 @@
+pkcon get-updates | egrep "Normal|Security" | awk -F\; 'BEGIN {norm=0; sec=0}; /Normal/ {norm++}; /Security/ {sec++}; END {UPD=norm","sec; print UPD }'

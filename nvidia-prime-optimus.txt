@@ -1,0 +1,37 @@
+https://ask.fedoraproject.org/t/fedora-31-nvidia-prime-laptop-gnome-display-settings-and-xrandr-fails-to-detect-external-monitor-but-nvidia-settings-can-see-it/4204-- 
+
+
+$ cat  /etc/X11/xorg.conf.d/brtest.conf
+Section "ServerLayout"
+    Identifier "layout"
+    Screen 0 "nvidia"
+    Inactive "intel"
+EndSection
+
+Section "Device"
+    Identifier "nvidia"
+    Driver "nvidia"
+    BusID  "PCI:1:0:0"
+#   Option              "DPI" "96 x 96"  # Uncoment to fix the size of fonts
+EndSection
+
+Section "Screen"
+    Identifier "nvidia"
+    Device "nvidia"
+    # Uncomment this line if your computer has no display devices connected to
+    # the NVIDIA GPU.  Leave it commented if you have display devices
+    # connected to the NVIDIA GPU that you would like to use.
+    # Option "UseDisplayDevice" "none"
+EndSection
+
+Section "Device"
+    Identifier "intel"
+    Driver "intel"
+#    Option      "AccelMethod"  "uxa"
+    BusID "PCI:0:2:0"
+EndSection
+
+Section "Screen"
+    Identifier "intel"
+    Device "intel"
+EndSection

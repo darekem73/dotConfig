@@ -1,0 +1,2 @@
+#!/bin/bash
+pacmd list-cards | egrep "^\s*name|^\s+active profile" | sed 's/^\s*//'

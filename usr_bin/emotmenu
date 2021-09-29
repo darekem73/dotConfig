@@ -1,0 +1,2 @@
+#!/bin/bash
+cat /usr/local/bin/utf8.csv | grep -v control | awk -F, 'NR>2 {printf "%c,%s,%s,%s,%s\n", strtonum("0x"substr($1,3)),$1,$2,$3,$4}' | awk -F, '(length($4)>0 || length($5)>1) { if (length($1)>length($3)) printf "%s,%s,%s,%s\n",$2,$1,$4,$5; else printf "%s,%s,%s,%s\n",$2,$3,$4,$5 }' | dmenu -i -l 10 | sed -n '1p' | awk -F, '{printf "%s", $2}' | xsel -b

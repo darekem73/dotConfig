@@ -1,0 +1,2 @@
+#!/bin/bash
+i3lock -i /usr/share/backgrounds/green_4.png -c 000000

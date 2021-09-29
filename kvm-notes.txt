@@ -1,0 +1,18 @@
+NMI received for unknown reason
+Dazed and confused
+
+1. enable proper end of interrupt in the domain file
+<domain>
+  …
+  <features>
+    <apic eoi='on'/>
+    …
+
+2. Switching to a QEMU emulated CPU rather than using CPU passthrough.
+remove: <cpu mode='host-passthrough'/>
+
+3. Changing the KVM clock timer (adding <timer name='kvmclock' present='no'/> to the guest).
+
+4. Disabling ACPI support in the guest.
+
+

@@ -1,0 +1,7 @@
+#!/bin/bash
+IP=$(/sbin/ip route | awk '/default/ { print $3 }')
+if [ -z "$IP" ]; then
+     printf "%s" "net down"
+else
+    printf "%s" `echo $IP | cut -d\  -f1`
+fi

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=spectrwm
+Comment=The spectrwm window manager
+Type=Application
+Exec=/usr/local/bin/run-spectrwm
+TryExec=/usr/local/bin/run-spectrwm
+Icon=spectrwm
+Keywords=tiling;window;manager;wm;
+

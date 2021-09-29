@@ -1,0 +1,2 @@
+#!/bin/bash
+trayer --edge top --align right --transparent true --heighttype request --height 17 --widthtype pixel --width 47 --tint 0x000000

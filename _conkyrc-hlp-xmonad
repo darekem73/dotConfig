@@ -1,0 +1,43 @@
+conky.config = {
+	alignment = 'bottom_left',
+	background = true,
+	color2 = '556064',
+	cpu_avg_samples = 2,
+	default_color = 'F9FAF9',
+	double_buffer = true,
+	font = 'Sans-serif:size=8',
+	draw_shades = false,
+	gap_x = 25,
+	gap_y = 45,
+	minimum_width = 200,
+	no_buffers = true,
+	own_window = true,
+	own_window_type = 'override',
+	own_window_transparent = true,
+	update_interval = 2.0,
+	use_xft = true,
+}
+conky.text = [[
+${color2}open new terminal - ${color}mod+Shift+Enter
+${color2}kill focused - ${color}mod+Shift+c
+${color2}toggle layout - ${color}mod+Space
+${color2}reset layout - ${color}mod+Shift+Space
+${color2}fullscreen layout - ${color}mod+f
+${color2}dmenu - ${color}mod+p
+${color2}switch to workspace 1-8 - ${color}mod+1-8
+${color2}send to workspace 1-8 - ${color}mod+Shift+1-8
+${color2}move between windows on workspace - ${color}mod+j mod+k
+${color2}resize horizontal split - ${color}mod+h mod+l
+${color2}resize vertical split - ${color}mod+a mod+z
+${color2}resize gaps - ${color}mod+u i o
+${color2}move windows on workspace - ${color}mod+arrowkeys
+${color2}resize windows on workspace - ${color}mod+Shift+arrowkeys
+${color2}toggle active floating - ${color}mod+Shift+f
+${color2}unfloat active window - ${color}mod+t
+${color2}unfloat all - ${color}mod+Shift+t
+${color2}logout - ${color}mod+Shift+q
+${color2}lock screen - ${color}mod+Ctrl+l
+${color2}goto window menu - ${color}mod+0
+
+default mod=<Alt>
+]]

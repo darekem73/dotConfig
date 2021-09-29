@@ -1,0 +1,33 @@
+#!/bin/bash
+function usage() {
+	echo "Usage: <$0> <-inc|-dec> <increment>"
+}
+
+CUR=`cat /sys/class/backlight/amdgpu_bl0/brightness`
+if [ $# -eq 0 ]; then
+	echo $CUR
+	exit 0
+fi
+
+if [ $# -ne 2 ]; then
+	usage
+	exit 1
+fi
+
+case $1 in
+	"-inc")
+		DELTA=$2
+		;;
+	"-dec")
+		DELTA=$(( -$2 ))
+		;;
+	*)
+		usage
+		exit 1
+		;;
+esac
+(( CUR=$CUR+$DELTA ))
+[ $CUR -gt 255 ] && CUR=255
+[ $CUR -lt 0 ] && CUR=0
+
+echo $CUR > /sys/class/backlight/amdgpu_bl0/brightness

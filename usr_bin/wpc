@@ -1,0 +1,4 @@
+#!/bin/bash
+
+feh --no-fehbg --bg-fill --recursive --randomize /usr/share/backgrounds/
+while sleep 600; do feh --no-fehbg --bg-fill --recursive --randomize /usr/share/backgrounds/; done

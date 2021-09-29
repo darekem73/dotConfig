@@ -1,0 +1,12 @@
+[[ -f ~/.bashrc ]] && . ~/.bashrc
+
+export EDITOR="vim"
+export TERMINAL="st"
+export BROWSER="qutebrowser"
+export NNN_PLUG='c:fzcd;o:fzopen;h:fzhist;i:imgview;d:diffs;l:launch'
+export QT_SCALE_FACTOR=0.50
+TZ='Europe/Warsaw'; export TZ
+
+#if [[ "$(tty)" = "/dev/tty1" ]]; then
+#	pgrep dwm || startx
+#fi

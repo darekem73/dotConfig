@@ -1,0 +1,3 @@
+#!/bin/bash
+
+[[ $(echo -e "N\nY" | dmenu -p "Exit dwm?") == "Y" ]] && pkill dwm

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+case $BLOCK_BUTTON in
+  1) zenity --calendar ;;
+esac
+
+DATE=`date '+%Y-%m-%d %H:%M'`
+echo $DATE
+echo $DATE

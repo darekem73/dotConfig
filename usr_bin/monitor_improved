@@ -1,0 +1,23 @@
+#!/bin/bash
+
+EXTERNAL=`xrandr | grep " connected" | awk '/^HDMI|^DP/ {print $1}'`
+INTERNAL=`xrandr | grep " connected" | awk '/^eDP/ {print $1}'`
+
+case "$1" in
+	"same") COMMAND="--same-as"
+		xrandr --output $INTERNAL --auto --primary --output $EXTERNAL --auto $COMMAND $INTERNAL
+		;;
+	"extend") COMMAND="--right-of"
+		xrandr --output $INTERNAL --auto --primary --output $EXTERNAL --auto $COMMAND $INTERNAL
+		;;
+	"single") COMMAND="--off"
+		xrandr --output $INTERNAL --auto --primary --output $EXTERNAL --auto $COMMAND
+		;;
+	*) echo $INTERNAL
+		echo $EXTERNAL
+		;;
+esac
+
+
+#xrandr | grep " connected" | awk '/HDMI/ {secondary=$1}; /DP/ {primary=$1}; END {print system("xrandr --output "primary" --primary"); system("xrandr --output "secondary" --right-of "primary) }'
+

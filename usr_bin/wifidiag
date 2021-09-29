@@ -1,0 +1,6 @@
+#!/bin/bash
+
+ESSID=`iwgetid -r`
+QUALITY=`iwconfig 2>/dev/null | egrep -o "Link Quality=[0-9]+/[0-9]+" | awk -F= '{ print $2 }'`
+
+echo $ESSID $QUALITY | awk '{ printf "%s", $0}'

@@ -1,0 +1,3 @@
+darek sparky = (root) NOPASSWD: /sbin/shutdown
+darek sparky = (root) NOPASSWD: /sbin/reboot
+darek sparky = (root) NOPASSWD: /sbin/poweroff

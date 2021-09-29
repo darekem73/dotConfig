@@ -1,0 +1,23 @@
+#!/bin/bash
+
+tempfile=$(mktemp)
+youtube_dl_log=$(mktemp)
+
+notify-send "Searching"
+youtube-dl -j "ytsearch15:$*" > $tempfile
+notify-send "Finished searching"
+
+mapfile -t youtube_urls < <(cat $tempfile | jq '.webpage_url' | tr -d '"' )
+
+while :
+do
+	NUM=`cat $tempfile | jq -c '[.fulltitle, (.duration / 60 | floor), .uploader]' | awk 'BEGIN {c=1}; {print c, $0; c++}' | dmenu -i -l 20 | cut -d\  -f1`
+	if [[ -n "$NUM" ]]; then
+		#echo $NUM
+		#echo `cat $tempfile | jq '.fulltitle, .webpage_url'`
+		#echo ${youtube_urls[$NUM - 1]}
+		youtube-dl --no-progress ${youtube_urls[$NUM-1]} &
+	else
+		break
+	fi
+done

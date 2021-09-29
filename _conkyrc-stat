@@ -1,0 +1,112 @@
+conky.config = {
+	alignment = 'top_right',
+	xinerama_head = 0,
+	background = true,
+--	color2 = '0313aa',
+--	color2 = 'C0C0C0', -- silver gray
+	color2 = '03a023', -- forest green
+--	color2 = '6c798e', -- steel blue
+	color3 = 'FE9A2E', -- warm orange
+--	color3 = 'FF8C00', -- dark orange
+--	color3 = '808000', -- olive
+	cpu_avg_samples = 2,
+	default_color = 'F9FAF9',
+--	default_color = '000000',
+--	default_color = '656667', -- Waldorf original colour
+--	default_color = '7a7a7a', -- Flame  & Bunsen Grey
+--	default_color = '929292', -- Labs Grey
+--	default_color = 'C0C0C0', -- Silver
+	double_buffer = true,
+	font = 'Sans-serif:size=8',
+--	font = 'Monospace:size=8',
+	draw_shades = true,
+	stippled_borders = 0,
+        draw_borders = false,
+	draw_graph_borders = false,
+	draw_outline = false,
+	gap_x = 25,
+	gap_y = 40,
+	minimum_width = 250,
+	no_buffers = true,
+	own_window = true,
+	own_window_type = 'override',
+--	own_window_type = 'desktop',
+--	own_window_type = 'normal',
+        own_window_class = 'Conky',
+	own_window_title = 'Conky',
+--	own_window_name = 'Conky',
+	own_window_hints = 'undecorated,below,skip_taskbar,skip_pager,sticky',
+	own_window_transparent = true,
+	own_window_argb_visual = true,
+	update_interval = 2.0,
+	use_xft = true,
+}
+conky.text = [[
+	${voffset 8}$color2${font Sans-serif:size=16}${time %A}$font\
+	${voffset -8}$alignr$color${font Sans-serif:size=38}${time %e}$font
+	$color${voffset -30}$color${font Sans-serif:size=18}${time %b}$font\
+	${voffset -3} $color${font Sans-serif:size=20}${time %Y}$font$color2$hr
+	#$color${voffset -30}${goto 135}${font Sans-serif:size=12}${time %H:%M}
+	#
+	${voffset 20}${goto 40}${color}${font Sans-serif:bold:size=8}CPU$alignr$cpu%
+	${voffset 5}${goto 40}$font$color2${top name 1}$alignr$color${top cpu 1}%
+	${goto 40}$color2${top name 2}$alignr$color${top cpu 2}%
+	${goto 40}$color2${top name 3}$alignr$color${top cpu 3}%
+	${goto 40}$color2${top name 4}$alignr$color${top cpu 4}%
+	# ${goto 40}$color2${top name 5}$alignr$color${top cpu 5}%
+	#
+	${voffset 10}${goto 40}${color}${font Sans-serif:bold:size=8}RAM used$alignr${mem /} / ${memmax /}
+	${voffset 5}${goto 40}$font$color2${top_mem name 1}$alignr$color${top_mem mem_res 1}
+	${goto 40}$color2${top_mem name 2}$alignr$color${top_mem mem_res 2}
+	${goto 40}$color2${top_mem name 3}$alignr$color${top_mem mem_res 3}
+	${goto 40}$color2${top_mem name 4}$alignr$color${top_mem mem_res 4}
+	# ${goto 40}$color2${top_mem name 5}$alignr$color${top_mem mem_res 5}$font
+	#
+	${voffset 10}${goto 40}${color}${font Sans-serif:bold:size=8}Root free$alignr${fs_free /} / ${fs_size /}
+	#${if_mounted /media/darek/Dane}
+	${goto 40}${color}${font Sans-serif:bold:size=8}Home free$alignr${fs_free /home} / ${fs_size /home}
+	#${endif}
+	#
+	${voffset 10}${goto 40}${color}${font Sans-serif:bold:size=8}CPU Frequency
+	${voffset 5}${goto 40}${color2}${font}CPU 1$alignr${color}${freq 1} MHz
+	${goto 40}${color2}${font}CPU 2$alignr${color}${freq 2} MHz
+	${goto 40}${color2}${font}CPU 3$alignr${color}${freq 3} MHz
+	${goto 40}${color2}${font}CPU 4$alignr${color}${freq 4} MHz
+	${goto 40}${color2}${font}CPU 5$alignr${color}${freq 5} MHz
+	${goto 40}${color2}${font}CPU 6$alignr${color}${freq 6} MHz
+	${goto 40}${color2}${font}CPU 7$alignr${color}${freq 7} MHz
+	${goto 40}${color2}${font}CPU 8$alignr${color}${freq 8} MHz
+	#
+	${voffset 10}${goto 40}${font Sans-serif:bold:size=8}${color}TEMP${alignr}${hwmon 5 temp 1}°.${hwmon 6 temp 1}°.${hwmon 6 temp 2}°.${hwmon 6 temp 3}° (${hwmon 6 fan 1} rpm)
+	# ${voffset 10}${goto 40}${font Sans-serif:bold:size=8}${color}TEMP${alignr}nvme:${hwmon 1 temp 1}° gpu:${hwmon 3 temp 1}° k10:${hwmon 6 temp 1}° dell:${hwmon 7 temp 1}° ath10k:${hwmon 8 temp 1}°
+	${hr}
+	#
+	${voffset 10}${goto 10}${color}CPU
+	${cpugraph cpu0 50,250 FE9A2E FFC521 -l}
+	${voffset 10}${color2}${cpugraph cpu1 25,56 03a023 4CED6C -l}  ${cpugraph cpu2 25,56 03a023 4CED6C -l}  ${cpugraph cpu3 25,56 03a023 4CED6C -l}  ${cpugraph cpu4 25,56 03a023 4CED6C -l}
+	${voffset 10}${color2}${cpugraph cpu5 25,56 03a023 4CED6C -l}  ${cpugraph cpu6 25,56 03a023 4CED6C -l}  ${cpugraph cpu7 25,56 03a023 4CED6C -l}  ${cpugraph cpu8 25,56 03a023 4CED6C -l}
+	#${voffset 10}${color2}${cpugraph cpu3 25,55 -l}$alignr${cpugraph cpu4 25,55 -l}
+	#
+	${voffset 10}${goto 10}${color}MEM
+	${memgraph 50,250 5e7b7b d8deeb -l}
+	#
+	${voffset 10}${goto 10}${color}IO
+	${diskiograph /dev/nvme0n1p3 50,250 99c8e8 618094 -l}
+	#
+	#${if_match "${addr wlan0}"!="No Address"}
+	#${voffset 10}${goto 10}${color}NET
+	#${color3}${downspeedgraph wlan0 50,250 5e7b7b d8deeb}
+	#${goto 40}${color1}${font}download ${alignr}${downspeedf wlan0}k/s (${totaldown wlan0})
+	#${goto 40}${hr}
+	#${goto 40}${color1}${font}upload ${alignr}${upspeedf wlan0}k/s (${totalup wlan0})
+	#${color3}${upspeedgraph wlan0 50,250 99c8e8 618094}
+	#${endif}
+	#
+	#${voffset 15}${goto 40}${color2}${font Sans-serif:size=8}LSB:${alignr}${color}${execi 10000 /usr/bin/lsb_release --all | awk -F ":" 'function ltrim(s) { sub(/^[ \t\r\n]+/, "", s); return s }; /Description/ {print ltrim($2)}'}
+	#${voffset 10}${color2}${alignr}${execi 1200 whoami}@${nodename}
+	${voffset 15}${alignr}${color2}${font}uptime: ${color}${uptime_short}
+	${voffset 5}${color2}${font}${alignr}kernel: ${color}${kernel}
+	#
+	#$color3${voffset 10}${goto 10}${font Ubuntu-condensed:size=12}${alignr}${execi 60 /usr/local/bin/fuzzy-clock-im.sh}
+]]
+

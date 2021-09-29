@@ -1,0 +1,1 @@
+i3-save-tree --output=eDP1  | awk 'BEGIN {cur=system("~/i3-get-current-ws.sh"); c=1; wrk[0]=1; delete wrk[0]; PROCINFO["sorted_in"]="@ind_num_asc"}; /^{/,/^}/ {ind=length(wrk); wrk[ind]=$0}; NF==0 {for (l in wrk) {if (cur==c) print wrk[l]; delete wrk[l]}; c++}' | egrep -v "\"fullscreen_mode\": 1,|\"type\": \"workspace\","

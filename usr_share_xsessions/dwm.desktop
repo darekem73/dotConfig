@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=dwm
+Comment=The dwm window manager
+Type=Application
+Exec=/usr/local/bin/dwm
+TryExec=/usr/local/bin/dwm
+Icon=dwm
+Keywords=tiling;window;manager;wm;
+

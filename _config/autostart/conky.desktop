@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Conky
+Comment=Runs conky
+Exec=/usr/bin/conky -c /home/darek/.conkyrc-stat-cinnamon
+Terminal=false
+Type=Application
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Categories=GTK;GNOME;Settings;
+X-GNOME-Autostart-Delay=0
+OnlyShowIn=GNOME

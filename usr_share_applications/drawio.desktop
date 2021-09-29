@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Draw.io
+GenericName=Vector image processor
+Exec=draw.io %F
+MimeType=application/drawio
+NoDisplay=true
+Icon=draw.io

@@ -1,0 +1,2 @@
+#!/bin/bash
+flatpak kill com.wps.Office

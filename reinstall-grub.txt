@@ -1,0 +1,6 @@
+sudo mount /dev/sdXXX /mnt
+sudo mount /dev/sdXX /mnt/boot/efi
+for i in /dev /dev/pts /proc /sys /run; do sudo mount -B $i /mnt$i; done
+sudo chroot /mnt
+grub-install /dev/sdX
+update-grub  

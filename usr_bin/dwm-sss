@@ -1,0 +1,13 @@
+#!/bin/bash
+while true;
+do
+    f=$(cat /sys/class/thermal/thermal_zone0/temp)
+    t=$(echo $f | cut -b -2).$(echo $f | cut -b 3-)°C
+    d=$(date '+%H:%M:%S')
+    bl=$(cat /sys/class/power_supply/BAT1/capacity)
+    bs=$(cat /sys/class/power_supply/BAT1/status | cut -c1-3)
+    w=$(iwgetid | sed 's/   ESSID://;s/"//g')
+    l=$(uptime | awk '{ print $9}' | sed 's/,$//;s/,/./')
+    xsetroot -name "$l | $w | $bl% ($bs) | $d"
+    sleep 2;
+done;

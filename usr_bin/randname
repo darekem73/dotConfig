@@ -1,0 +1,31 @@
+#!/bin/bash
+# generate random name of given length or 8 chars
+
+if [[ -z "$1" ]]; then
+	LENGTH=8
+else
+	LENGTH=$1
+fi
+
+UPCASE=65 #26
+LOWCASE=97 #26
+DIGIT=48 #10
+RESULT=""
+
+for i in `seq $LENGTH`; do
+	case $(($RANDOM % 3)) in
+		"0")
+			LETTER=$(printf \\$(printf '%03o' $(($UPCASE+$RANDOM % 26))))
+			;;
+		"1")
+			LETTER=$(printf \\$(printf '%03o' $(($LOWCASE+$RANDOM % 26))))
+			;;
+		"2")
+			LETTER=$(printf \\$(printf '%03o' $(($DIGIT+$RANDOM % 10))))
+			;;
+	esac
+	RESULT=$RESULT""$LETTER
+done
+
+echo $RESULT
+#echo $RESULT | xsel -b

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+tmux attach -t scratchpad || tmux new-session -s "scratchpad" "bash"

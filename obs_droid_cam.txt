@@ -1,0 +1,118 @@
+1. Droid cam
+	- enable debugging in Android phone
+	- install Droid Cam from the store
+	- download & follow instruction: https://www.dev47apps.com/droidcam/linux/
+	The GNU/Linux client is a combination of a Video4Linux2 device driver and an executable app that will transfer the stream from the phone to the driver. Sound support is provided via the ALSA Loopback device.
+	
+	It’s assumed you are somewhat familiar with the system and how to use the Terminal. Please keep in mind other posts on the site are Windows oriented.
+	
+	Install
+	
+	Note: Only 64-bit binaries are provided, you’ll need to compile the client from source if you are running a 32-bit system.
+	1. Ensure the following dependencies are installed (using apt-get, yum, etc.): gcc make linux-headers-`uname -r`
+	
+	2. If droidcam is already installed, make sure it’s not open.
+	
+	3. Get the latest client:
+	cd /tmp/
+	wget https://files.dev47apps.net/linux/droidcam_latest.zip
+	echo "952d57a48f991921fc424ca29c8e3d09 droidcam_latest.zip" | md5sum -c --
+	#OK?
+	unzip droidcam_latest.zip -d droidcam && cd droidcam
+	sudo ./install
+	
+	The install script will try to auto-sign the drivers if you have secure boot enabled. If the signing fails, you’ll be promoted to manually take care of signing the driver by following ‘Secure Boot Module Signing’ instructions for your distro (you can Google it).
+	
+	If all goes well, you can ensure the video device is installed via lsmod | grep v4l2loopback_dc. You should see v4l2loopback_dc in the output.
+	
+	Open up a V4L2 compatible program (VLC player, Skype, Cheese, etc) and you should see DroidCam listed as a video device (or it might be listed as /dev/video).
+	
+	Sound support is also available. After the above installation succeeds, you can then run
+	sudo ./install-sound
+	in the same directory. This will load the Linux ALSA Loopback sound card which the Droidcam client will use for audio input.
+	
+	4. Start the droidcam client via the Terminal, or create a launcher if you’re using gnome. There is also a simpler cli client, droidcam-cli.
+	
+	5. Check the connection post on how to connect. If all goes well, you should see the output in the chat application, and you’re done!
+	
+	Extra Notes
+	Video rotation: You can achieve portrait video by inverting the webcam. See the HD Mode section below.
+	
+	Android USB connections: The client app will try to invoke adb automatically, provided adb is installed.
+	Debian-based Linux users can do: sudo apt-get install adb
+	Fedora/SUSE-based Linux users can do: sudo yum install android-tools
+	
+	iOS USB Connections: The client will try to communicate with usbmuxd to detect and connect to your iOS device. Make sure usbmuxd is installed and running.
+	
+	Sound support: In order to get the mic to show up in PulseAudio you can either run pacmd load-module module-alsa-source device=hw:Loopback,1,0 (you may need to adjust the last number), or by editing /etc/pulse/default.pa as described here. On some systems you need to do this after launching the droidcam client, and before you connect to the app.
+	
+	HD Mode – Change webcam resolution
+	
+	You can change the webcam output resolution as follows:
+	1. Close any programs using the droidcam webcam. Unload the device driver:
+	sudo rmmod v4l2loopback_dc
+	
+	2. Re-load it with new options (WIDTH and HEIGHT are numbers). :
+	
+	sudo insmod /lib/modules/`uname -r`/kernel/drivers/media/video/v4l2loopback-dc.ko width=WIDTH height=HEIGHT
+	
+	Standard sizes (Width x Height): 640×480, 960×720, 1280×720 (720p), 1920×1080 (1080p).
+	
+	It’s also possible to invert the video size (eg. 480×640, width=480 height=640), which will make the webcam vertical and rotate the video 90º. Not all programs may load the webcam with inverted parameters (eg. Discord does not) but many do (eg. Zoom and OBS).
+	
+	3. Restart the droidcam client to reload the settings, and test it out. You can keep changing the resolution.
+	
+	4. Edit the text file /etc/modprobe.d/droidcam.conf with the new options to make the change stick.
+	
+	Removal
+	
+	Close any running programs to make sure droidcam is not in use and run sudo /opt/droidcam-uninstall.
+
+2. OBS + virtual camera
+	- install
+	Commandline: apt install obs-studio
+	Install: v4l2loopback-dkms:amd64 (0.12.5-1)
+	Commandline: apt install cmake
+	Commandline: apt install libobs-dev
+	Commandline: apt install qtbase5-dev
+	Commandline: apt install adb
+	
+	1-I install OBS though command line following their instructions on obsproject.com
+	https://obsproject.com/wiki/install-instructions#linux
+	
+	2-git clone https://github.com/umlaeute/v4l2loopback.git
+	
+	3-cd v4l2loopback
+	make
+	make && sudo make install
+	sudo modprobe v4l2loopback devices=1 max_buffers=2 exclusive_caps=1 card_label="VirtualCam" (compatibility with Chrome) 
+	
+	4-ls/dev/video*
+	It gives me:
+	/dev/video0 /dev/video1 /dev/video2
+	
+	5-Open OBS, go in tools. See the option is not there.
+	
+	6-Installing obs-v4l2sink so I go here: https://github.com/CatxFish/obs-v4l2sink
+	git clone --recursive https://github.com/obsproject/obs-studio.git
+	git clone https://github.com/CatxFish/obs-v4l2sink.git
+	cd obs-v4l2sink
+	mkdir build && cd build
+	cmake -DLIBOBS_INCLUDE_DIR="../../obs-studio/libobs" -DCMAKE_INSTALL_PREFIX=/usr ..
+	make -j4
+	sudo make install
+	sudo cp /usr/lib/obs-plugins/v4l2sink.so /usr/lib/x86_64-linux-gnu/obs-plugins/
+	
+	7-Open OBS again. Choose my desktop as source. I see my desktop bright and clear in the OBS preview. Go in tools. I now see V4L2 video output
+	
+	8-Path: /dev/video2, video format NV12, click start
+
+
+!!!IMPORTANT: remember to load both v4l2loopback (for obs sink) and v4l2loopback-dc (for droidcam)!!!
+
+3. splitting camera with gstreamer (one camera -> 2 virtual devices)
+
+https://sysplay.in/blog/linux/2019/05/simultaneous-access-to-single-camera/
+
+gst-launch-1.0 v4l2src device=/dev/video0 ! tee name=t ! queue ! v4l2sink device=/dev/video1 t. ! queue ! v4l2sink device=/dev/video2
+

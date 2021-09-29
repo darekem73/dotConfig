@@ -1,0 +1,8 @@
+#!/bin/bash
+
+case $BLOCK_BUTTON in
+  4) xbacklight -inc 5 ;; # scroll up, increase
+  5) xbacklight -dec 5 ;; # scroll down, decrease
+esac
+
+printf "%.0f " $(xbacklight -get)

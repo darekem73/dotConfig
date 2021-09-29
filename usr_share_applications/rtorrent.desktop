@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=rtorrent
+GenericName=Bittorrent client
+Exec=rtorrent %F
+MimeType=application/x-bittorrent
+NoDisplay=true
+Icon=rtorrent
