@@ -1,0 +1,2 @@
+#!/bin/bash
+xinput disable `xinput list | grep "Microsoft Microsoft® Nano Transceiver v2.0 Mouse" | grep -oP "id=[0-9]*" | grep -oP "[0-9]*"`

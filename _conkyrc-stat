@@ -1,6 +1,7 @@
 conky.config = {
 	alignment = 'top_right',
 	xinerama_head = 0,
+--	xinerama_head = 1,
 	background = true,
 --	color2 = '0313aa',
 --	color2 = 'C0C0C0', -- silver gray
@@ -37,6 +38,7 @@ conky.config = {
 --	own_window_name = 'Conky',
 	own_window_hints = 'undecorated,below,skip_taskbar,skip_pager,sticky',
 	own_window_transparent = true,
+--	own_window_colour = '#282828',
 	own_window_argb_visual = true,
 	update_interval = 2.0,
 	use_xft = true,
@@ -78,6 +80,7 @@ conky.text = [[
 	${goto 40}${color2}${font}CPU 8$alignr${color}${freq 8} MHz
 	#
 	${voffset 10}${goto 40}${font Sans-serif:bold:size=8}${color}TEMP${alignr}${hwmon 5 temp 1}°.${hwmon 6 temp 1}°.${hwmon 6 temp 2}°.${hwmon 6 temp 3}° (${hwmon 6 fan 1} rpm)
+	#${voffset 10}${goto 40}${font Sans-serif:bold:size=8}${color}TEMP${alignr}${hwmon 6 temp 1}°.${hwmon 7 temp 1}°.${hwmon 7 temp 2}°.${hwmon 7 temp 3}° (${hwmon 7 fan 1} rpm)
 	# ${voffset 10}${goto 40}${font Sans-serif:bold:size=8}${color}TEMP${alignr}nvme:${hwmon 1 temp 1}° gpu:${hwmon 3 temp 1}° k10:${hwmon 6 temp 1}° dell:${hwmon 7 temp 1}° ath10k:${hwmon 8 temp 1}°
 	${hr}
 	#

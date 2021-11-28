@@ -1,16 +1,25 @@
 Config {  
         -- font = "xft:Monospace:pixelsize=11"
+        -- font = "xft:Monospace:pixelsize=10"
         -- font = "xft:DejaVuSansMono:pixelsize=12:antialias=true:hinting=true"
         font = "xft:DejaVuSansMono:pixelsize=11:antialias=true:hinting=true"
+        -- font = "xft:DejaVuSansMono:pixelsize=10:antialias=true:hinting=true"
         -- font = "xft:FreeMono:style=Bold:pixelsize=12"
         -- font = "xft:FreeMono:style=Bold:size=10"
-        , bgColor = "#101010"
-        -- , fgColor = "grey"
+        -- , bgColor = "#101010"
+	-- Gruvbox dark
+        , bgColor = "#282828"
+        , fgColor = "#ebdbb2"
         -- , position = TopW L 94
         , lowerOnStart = True
-       , commands = [ 
+        , commands = [ 
            -- Run MultiCpu ["-L","25","-H","75","--low","green","--normal","yellow","--high","red","-t","<total>% <autovbar>"] 20
-           Run Network "tun1" ["-t","t:[<rx>/<tx>]"] 10
+           -- Run MultiCoreTemp ["-t", "T:<avg>°C/<avgpc>%",
+           Run MultiCoreTemp ["-t", "T:<avg>°C",
+                   "-L", "70", "-H", "90",
+                   "-l", "green", "-n", "yellow", "-h", "red",
+                   "--", "--mintemp", "30", "--maxtemp", "105"] 50
+           , Run Network "tun1" ["-t","t:[<rx>/<tx>]"] 10
            , Run Network "wlan0" ["-t","w:[<rx>/<tx>]"] 10
            , Run Network "eth0" ["-t","e:[<rx>/<tx>]"] 10
            , Run Wireless "wlan0" ["-t", "<essid> <quality>", "-L", "30", "-H", "70",
@@ -26,7 +35,8 @@ Config {
            , Run DiskU [("/", "/<free>"), ("/home", "/H:<free>")]
                        ["-L", "20", "-H", "50", "-m", "1", "-p", "3"]
                        100
-           , Run Date "%a %Y-%m-%d %H:%M" "date" 100
+           -- , Run Date "%a %Y-%m-%d %H:%M" "date" 100
+           , Run Date "%a %d.%m %H:%M" "date" 100
            -- , Run StdinReader
            , Run UnsafeStdinReader
            , Run Battery    [ "--template" , "<acstatus>"
@@ -70,5 +80,5 @@ Config {
        -- , template = "%UnsafeStdinReader% }{ <fc=#ff66ff>%tun1%</fc> | ♫ %Vol% | ☀ %mybright% | %wlan0% | %wlan0wi% | %eth0% | %gw% | %net% | %cpu% | %memory% * %swap% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>"
        -- , template = "%StdinReader% }{ <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %eth0% | %net% | %cpu% | %memory% * %swap% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>"
        -- , template = "%UnsafeStdinReader% }{ %alsa:default:Master%/%alsa:default:Capture% | <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %eth0% | %net% | %cpu% | %memory% %swap% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>"
-       , template = "%UnsafeStdinReader% }{ ♫ %alsa:default:Master%/%alsa:default:Capture% | <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %eth0% | %net% | %cpu% | %memory% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>"
+       , template = "%UnsafeStdinReader% }{ %multicoretemp% | ♫ %alsa:default:Master%/%alsa:default:Capture% | <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %eth0% | %net% | %cpu% | %memory% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>       "
 }

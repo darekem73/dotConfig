@@ -467,7 +467,7 @@ main = do
                        , ((modMask, xK_p), spawn "dmenu_run -i") -- %! Launch dmenu
                        , ((mod4Mask, xK_s), spawn "sshmenu") -- %! Launch sshmenu
                        , ((mod4Mask, xK_p), spawn "passmenu") -- %! Launch passmenu
-                       , ((modMask .|. shiftMask, xK_p), spawn "rofi -show drun -font 'Monospace 9' -theme solarized")
+                       , ((modMask .|. shiftMask, xK_p), spawn "rofi-run")
                        , ((modMask, xK_equal), spawn "sudo backlight -inc 10")
                        , ((modMask, xK_minus), spawn "sudo backlight -dec 10")
                        , ((modMask .|. shiftMask, xK_equal), spawn "amixer -D pulse sset Master 10%+")

@@ -1,0 +1,58 @@
+#!/bin/bash
+
+function usage() {
+	echo "Usage: <$0> [ [-c] [-r=<resolution|1440x900>] [-d=<display|:1>] ] [-e=<command>]"
+	echo "	-c	- create display"
+	echo "	-r=	- resolution"
+	echo "	-d=	- display number"
+	echo "	-e=	- execute command"
+}
+
+RUNNING=`ps -eo cmd | grep Xephyr | grep -v grep`
+
+DEFAULT_DISPLAY=:0
+if [ -n "$RUNNING" ]; then
+	TARGET_DISPLAY=`echo "$RUNNING" | awk '{print $(NF)}'`
+	RESOLUTION=`echo "$RUNNING" | awk '{print $(NF-1)}'`
+else
+	RESOLUTION=1440x900
+	TARGET_DISPLAY=:1
+fi
+
+if [ $# -eq 0 ]; then
+	usage
+	exit 0
+else
+	for i in "$@"; do
+		case $i in
+		-h|--help)
+			usage
+			exit 0
+			;;
+		-c)
+			CREATE=YES
+			;;
+		-r=*)
+			RESOLUTION="${i#*=}"
+			;;
+		-d=*)
+			TARGET_DISPLAY="${i#*=}"
+			;;
+		-e=*)
+			COMMAND="${i#*=}"
+			;;
+		#--default)
+		#	DEFAULT=YES
+		#	;;
+		#*)
+		#	# unknown option
+		#	;;
+		esac
+	done
+fi
+
+[ -n "$CREATE" ] && DISPLAY=$DEFAULT_DISPLAY Xephyr -br -ac -noreset -screen $RESOLUTION $TARGET_DISPLAY &
+
+sleep 1
+
+[ -n "$COMMAND" ] && DISPLAY=$TARGET_DISPLAY eval "$COMMAND"
