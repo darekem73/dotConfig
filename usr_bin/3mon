@@ -1,0 +1,1 @@
+xrandr --output eDP --auto --primary --output HDMI-A-0 --mode 1920x1080 --rate 75.00 --above eDP --output DisplayPort-0 --mode 1920x1080 --rate 75.00 --right-of HDMI-A-0

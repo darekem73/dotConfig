@@ -1,0 +1,6 @@
+#!/bin/bash
+dir=~/.config/kubenav
+sel=`find $dir -type f -printf "%P\n" | dmenu -i -l 20`
+
+[[ $sel != "" ]] && $HOME/Downloads/kubenav --kubeconfig $dir/$sel
+

@@ -5,6 +5,7 @@ set number  "This turns on line numbering
 "set softtabstop=4
 set smartindent
 nnoremap <F2> :set invpaste paste?<CR>
+vnoremap <C-c> :call system('xclip -sel c',@0)<CR>
 set pastetoggle=<F2>
 set showmode
 
@@ -50,6 +51,7 @@ inoremap <F5> <C-R>=strftime("%Y-%m-%d %T")<CR>
 set nocompatible
 syntax on
 set nowrap
+set autoread
 "set nobackup
 "set nowritebackup
 set noswapfile
