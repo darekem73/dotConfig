@@ -136,7 +136,8 @@ fi
 
 export NNN_EDITOR=vim
 export NNN_PLUG='f:fzcd;o:fzopen;h:fzhist;i:imgview;r:dragdrop;b:bookmarks;d:diffs;l:launch;u:dups;w:wdiffs'
-export NNN_COLORS='#04050a0d;1234'
+#export NNN_COLORS='#04050a0d;1234'
+export NNN_COLORS='#04010203;1234'
 export NNN_FCOLORS='c1e2272e006033f7c6d6abc4'
 export BOOKMARKS_DIR=/home/darek/.config/nnn/bookmarks
 #Order 	Hex 	Color
