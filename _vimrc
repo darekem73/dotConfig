@@ -83,6 +83,6 @@ set guifont=ProFontWindows\ 14
 
 "colorscheme osx_like
 "colorscheme desert
-colorscheme peachpuff
+"colorscheme peachpuff
 
 set diffopt+=internal,algorithm:patience
