@@ -61,6 +61,8 @@ import           XMonad.Actions.GroupNavigation
 import           XMonad.Actions.SwapPromote
 import           XMonad.Actions.Minimize
 import qualified XMonad.Actions.SwapWorkspaces as SWS
+-- TODO: use submap chords
+import           XMonad.Actions.Submap
 import           Graphics.X11.ExtraTypes.XF86
 import           System.IO
 import           System.Exit
@@ -354,7 +356,6 @@ main = do
     , borderWidth = 1
     , normalBorderColor = "#404040"
     , focusedBorderColor = "#FF0000"
-    -- , terminal = "alacritty"
     , terminal = "alacritty"
     , manageHook = composeAll [
                manageDocks
@@ -446,13 +447,14 @@ main = do
                        , ((modMask, xK_v), hideWindows)
                        , ((modMask .|. shiftMask, xK_v), restoreWindows)
                        -- | set particular layout
-                       , ((modMask, xK_n), sendMessage (JumpToLayout "accordion"))
+                       -- , ((modMask, xK_n), sendMessage (JumpToLayout "accordion"))
                        , ((modMask, xK_c), sendMessage (JumpToLayout "pdock"))
                        , ((modMask, xK_f), sendMessage (JumpToLayout "full"))
-                       , ((modMask, xK_s), sendMessage (JumpToLayout "stack"))
+                       -- , ((modMask, xK_s), sendMessage (JumpToLayout "stack"))
                        , ((modMask, xK_d), sendMessage (JumpToLayout "wide"))
                        , ((modMask, xK_g), sendMessage (JumpToLayout "grid"))
-                       , ((modMask, xK_t), sendMessage (JumpToLayout "float"))
+                       , ((modMask, xK_t), sendMessage (JumpToLayout "three"))
+                       -- , ((modMask, xK_t), sendMessage (JumpToLayout "float"))
                        -- | resize windows in slave stack
                        , ((modMask, xK_z), sendMessage MirrorShrink)
                        , ((modMask, xK_a), sendMessage MirrorExpand)
@@ -463,7 +465,7 @@ main = do
                        -- | rename workspace
                        , ((mod4Mask .|. shiftMask, xK_r), renameWS)   -- TODO: will need to change for 3-monitor setup
                        -- | goto workspace with prompt
-                       , ((mod4Mask, xK_r), wsPrompt def (X.windows . W.greedyView))   -- TODO: will need to change with 3-monitor setup
+                       -- , ((mod4Mask, xK_r), wsPrompt def (X.windows . W.greedyView))   -- TODO: will need to change with 3-monitor setup
 
                        -- | begin: just for testing
                        -- , ((modMask, xK_x), curWS >>= \d->spawn $ "notify-send "++d)
@@ -472,9 +474,14 @@ main = do
                        -- , ((modMask, xK_x), gotoDirPrompt def)
                        , ((modMask .|. shiftMask, xK_m     ), layoutPrompt wsPromptXPConfig)
                        -- , ((modMask, xK_x), addWorkspacePrompt wsPromptXPConfig )
-                       , ((modMask .|. controlMask, xK_x), wsCount >>= \c->addWorkspace c)
-                       , ((modMask .|. shiftMask, xK_x), removeWorkspace)
-                       , ((modMask, xK_x), wsCount >>= (\d->spawn $ "notify-send " ++ show ((read d) + 1)) >> addWorkspacePrompt wsPromptXPConfig )
+                       , ((modMask, xK_x), submap . M.fromList $
+                           [ ((0, xK_a),     wsCount >>= \c->addWorkspace c) -- add
+                           , ((0, xK_d),     removeWorkspace)                -- remove
+                           , ((0, xK_n),     wsCount >>= (\d->spawn $ "notify-send " ++ show ((read d) + 1)) >> addWorkspacePrompt wsPromptXPConfig ) -- add named
+                           ])
+                       -- , ((modMask .|. controlMask, xK_x), wsCount >>= \c->addWorkspace c)
+                       -- , ((modMask .|. shiftMask, xK_x), removeWorkspace)
+                       -- , ((modMask, xK_x), wsCount >>= (\d->spawn $ "notify-send " ++ show ((read d) + 1)) >> addWorkspacePrompt wsPromptXPConfig )
                        -- , ((modMask .|. controlMask, xK_x), addWorkspacePrompt wsPromptXPConfig )
                        -- , ((mod1Mask, xK_x), withFocused $ mouseResizeWindow) -- testing if in floating layout I can bring arbitrary/focused window to front
                        -- | end: just for testing
@@ -522,9 +529,9 @@ main = do
                                                                   , windowTitler = decorateName
                                                                   })
                        , ((modMask, xK_p), spawn "dmenu_run -i") -- %! Launch dmenu
-                       , ((mod4Mask, xK_k), spawn "kubenavmenu") -- %! Launch kubenavmenu
-                       , ((mod4Mask, xK_s), spawn "sshmenu") -- %! Launch sshmenu
-                       , ((mod4Mask, xK_p), spawn "passmenu") -- %! Launch passmenu
+                       -- , ((mod4Mask, xK_k), spawn "kubenavmenu") -- %! Launch kubenavmenu
+                       , ((modMask, xK_s), spawn "sshmenu") -- %! Launch sshmenu
+                       , ((modMask .|. controlMask, xK_p), spawn "passmenu") -- %! Launch passmenu
                        , ((modMask .|. shiftMask, xK_p), spawn "rofi-run")
                        , ((modMask, xK_equal), spawn "sudo backlight -inc 10")
                        , ((modMask, xK_minus), spawn "sudo backlight -dec 10")
