@@ -125,7 +125,7 @@ winCount :: X String
 winCount = gets (windowset) >>= return . show . length . W.index
 
 wsCount :: X String
-wsCount = gets (W.workspaces . windowset) >>= return . show . length
+wsCount = gets (scratchpadFilterOutWorkspace . W.workspaces . windowset) >>= return . show . length
 
 --workspaceCount :: X String
 --workspaceCount = withWindowSet $ \ws -> do return . show . length $ W.hidden ws ++ map W.workspace (W.current ws : W.visible ws)
@@ -475,9 +475,11 @@ main = do
                        , ((modMask .|. shiftMask, xK_m     ), layoutPrompt wsPromptXPConfig)
                        -- , ((modMask, xK_x), addWorkspacePrompt wsPromptXPConfig )
                        , ((modMask, xK_x), submap . M.fromList $
-                           [ ((0, xK_a),     wsCount >>= \c->addWorkspace c) -- add
+                           [ ((0, xK_a),     wsCount >>= \c->addWorkspace $ show ((read c) + 1)) -- add n+1 workspace
+                           -- [ ((0, xK_a),     wsCount >>= \c->addWorkspace c) -- add
                            , ((0, xK_d),     removeWorkspace)                -- remove
                            , ((0, xK_n),     wsCount >>= (\d->spawn $ "notify-send " ++ show ((read d) + 1)) >> addWorkspacePrompt wsPromptXPConfig ) -- add named
+                           , ((0, xK_Return),     wsCount >>= (\d->spawn $ "notify-send " ++ d) ) -- show count
                            ])
                        -- , ((modMask .|. controlMask, xK_x), wsCount >>= \c->addWorkspace c)
                        -- , ((modMask .|. shiftMask, xK_x), removeWorkspace)
