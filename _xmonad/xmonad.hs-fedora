@@ -127,7 +127,7 @@ winCount :: X String
 winCount = gets (windowset) >>= return . show . length . W.index
 
 wsCount :: X String
-wsCount = gets (W.workspaces . windowset) >>= return . show . length
+wsCount = gets (scratchpadFilterOutWorkspace . W.workspaces . windowset) >>= return . show . length
 
 --workspaceCount :: X String
 --workspaceCount = withWindowSet $ \ws -> do return . show . length $ W.hidden ws ++ map W.workspace (W.current ws : W.visible ws)
@@ -360,7 +360,7 @@ main = do
   -- | for signle monitor status bar
   -- statusBar <- spawnPipe "/usr/bin/xmobar /home/darek/.xmonad/xmobarrc"
   xmonad $ docks $ withUrgencyHook NoUrgencyHook $ ewmh def {
-    modMask = mod1Mask
+    modMask = modMask
     , borderWidth = 1
     , normalBorderColor = "#404040"
     , focusedBorderColor = "#FF0000"
@@ -483,10 +483,10 @@ main = do
                        -- , ((modMask .|. shiftMask, xK_m     ), layoutPrompt wsPromptXPConfig)
                        -- , ((modMask, xK_x), addWorkspacePrompt wsPromptXPConfig )
                        , ((modMask, xK_x), submap . M.fromList $
-                           [ ((0, xK_a),     wsCount >>= \c->addWorkspace c) -- add
+                           [ ((0, xK_a),     wsCount >>= \c->addWorkspace (show (read c + 1))) -- add
                            , ((0, xK_d),     removeWorkspace)                -- remove
-                           , ((0, xK_n),     wsCount >>= (\d->spawn $ "notify-send " ++ show ((read d) + 1)) >> addWorkspacePrompt wsPromptXPConfig ) -- add named
-                           , ((0, xK_s),     wsCount >>= (\d->spawn $ "notify-send " ++ show ((read d) + 1)) )
+                           , ((0, xK_n),     wsCount >>= (\d->spawn $ "notify-send " ++ d) >> addWorkspacePrompt wsPromptXPConfig ) -- add named
+                           , ((0, xK_Return),     wsCount >>= (\d->spawn $ "notify-send " ++ d) )
                            ])
                        -- , ((modMask .|. controlMask, xK_x), wsCount >>= \c->addWorkspace c)
                        -- , ((modMask .|. shiftMask, xK_x), removeWorkspace)
@@ -591,8 +591,10 @@ main = do
                        , ("M-S-<R>", withFocused (keysResizeWindow (15, 0) (0, 0)))
                        , ("M-S-<L>", withFocused (keysResizeWindow (-15, 0) (0, 0)))
                        -- | Go to the next / previous workspace
-                       , ("M-C-<R>", nextWS)
-                       , ("M-C-<L>", prevWS)
+                       -- , ("M-C-<R>", nextWS)
+                       , ("M-C-<R>", moveTo Next nonNSP)
+                       -- , ("M-C-<L>", prevWS)
+                       , ("M-C-<L>", moveTo Prev nonNSP)
                        , ("M-C-<U>", swapNextScreen)
                        , ("M-C-<D>", swapPrevScreen)
                        , ("M-o", incWindowSpacing 3)
@@ -614,6 +616,8 @@ main = do
                      ]  
      where
        modMask = mod1Mask -- myModMask
+       nonNSP          = WSIs (return (\ws -> W.tag ws /= "NSP"))
+       nonEmptyNonNSP  = WSIs (return (\ws -> isJust (W.stack ws) && W.tag ws /= "NSP"))
        helpCommand :: X ()
        helpCommand = spawn ("echo " ++ show help ++ " | xmessage -file -")
        decorateName :: X.WindowSpace -> Window -> X String

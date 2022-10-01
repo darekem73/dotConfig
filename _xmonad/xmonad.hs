@@ -584,8 +584,10 @@ main = do
                        , ("M-S-<R>", withFocused (keysResizeWindow (15, 0) (0, 0)))
                        , ("M-S-<L>", withFocused (keysResizeWindow (-15, 0) (0, 0)))
                        -- | Go to the next / previous workspace
-                       , ("M-C-<R>", nextWS)
-                       , ("M-C-<L>", prevWS)
+                       -- , ("M-C-<R>", nextWS)
+                       -- , ("M-C-<L>", prevWS)
+                       , ("M-C-<R>", moveTo Next nonNSP)
+                       , ("M-C-<L>", moveTo Prev nonNSP)
                        , ("M-C-<U>", swapNextScreen)
                        , ("M-C-<D>", swapPrevScreen)
                        , ("M-o", incWindowSpacing 3)
@@ -607,6 +609,8 @@ main = do
                      ]  
      where
        modMask = mod1Mask -- myModMask
+       nonNSP          = WSIs (return (\ws -> W.tag ws /= "NSP"))
+       nonEmptyNonNSP  = WSIs (return (\ws -> isJust (W.stack ws) && W.tag ws /= "NSP"))
        helpCommand :: X ()
        helpCommand = spawn ("echo " ++ show help ++ " | xmessage -file -")
        decorateName :: X.WindowSpace -> Window -> X String
