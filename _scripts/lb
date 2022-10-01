@@ -1,0 +1,9 @@
+#!/bin/bash
+
+TARGET=/dev/mapper/sda_crypt
+if ! [[ `lsblk -l -p -b -o NAME,TYPE,FSTYPE | egrep $TARGET` ]]; then
+        echo "Open target drive"
+        exit 1
+fi
+
+sudo timeshift --list-snapshots --snapshot-device $TARGET

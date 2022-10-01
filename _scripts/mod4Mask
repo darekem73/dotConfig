@@ -1,0 +1,2 @@
+#!/bin/bash
+sed -ibak 's/mod1Mask -- myModMask/mod4Mask -- myModMask/' .xmonad/xmonad.hs && xmonad --recompile && xmonad --restart

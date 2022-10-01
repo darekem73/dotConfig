@@ -1,0 +1,12 @@
+#!/bin/bash
+#mount external encrypted sd card
+
+TARGET=/dev/mapper/sda_crypt
+MOUNT=/media/darek/Dane
+if ! [[ `lsblk -l -p -b -o NAME,TYPE,FSTYPE | egrep $TARGET` ]]; then
+	sudo cryptsetup open /dev/sda sda_crypt
+fi
+
+if ! [[ `mount | grep $TARGET` ]]; then
+	sudo mount $TARGET $MOUNT
+fi

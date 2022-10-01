@@ -1,0 +1,12 @@
+#!/bin/bash
+#mount external encrypted backup drive
+
+TARGET=/dev/mapper/sdb_crypt
+MOUNT=/media/darek/Backup
+if ! [[ `lsblk -l -p -b -o NAME,TYPE,FSTYPE | egrep $TARGET` ]]; then
+	sudo cryptsetup open /dev/sdb sdb_crypt
+fi
+
+if ! [[ `mount | grep $TARGET` ]]; then
+	sudo mount $TARGET $MOUNT
+fi

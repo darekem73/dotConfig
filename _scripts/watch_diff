@@ -1,0 +1,69 @@
+#!/bin/bash
+#TODO: dodać możliwość wyświetlania wszystkiego ze zmianami lub tylko zmian
+#TODO: dodać komendę jako parametr i interwał (w sumie tak jak dla watch)
+
+function usage() {
+	echo "Usage: <$0> <-c=cmd> [-d] [-n=<delay>]"
+	echo "	-d		- diff only"
+	echo "	-n=<sec>	- delay"
+	echo "	-c=<cmd>	- execute command"
+}
+
+DELAY=2
+
+if [ $# -eq 0 ]; then
+	usage
+	exit 0
+else
+	for i in "$@"; do
+		case $i in
+		-h|--help)
+			usage
+			exit 0
+			;;
+		-d|--diff-only)
+			DIFF_ONLY=YES
+			;;
+		-n=*)
+			DELAY="${i#*=}"
+			;;
+		-c=*)
+			COMMAND="${i#*=}"
+			;;
+		#*)
+		#	# unknown option
+		#	;;
+		esac
+	done
+fi
+
+function d() {
+        date +"%Y-%m-%d_%H-%M-%S.%N"
+}
+
+function run_command() {
+	eval $COMMAND
+        #/home/darek/.scripts/connections/atende/5g/nrf search instance all | sed 1D | jq '.[]|select(.nfType=="PCF")'
+        #/home/darek/.scripts/connections/atende/5g/nrf search instance all | sed 1D | jq '.[]|.nfType'
+        #/home/darek/.scripts/connections/atende/5g/nrf search instance all | sed 1D | jq
+}
+
+prev=$(run_command)
+echo $(d)
+echo "$prev"
+while true; do
+        next=$(run_command)
+        if [[ "$next" != "$prev" ]]; then
+                echo ""
+                echo $(d)
+                #echo "$next"
+		if [ -n "$DIFF_ONLY" ]; then
+                	diff  <(echo "$prev") <(echo "$next") -u -p
+		else
+                	diff  <(echo "$prev") <(echo "$next") --new-line-format='+%L' --old-line-format='-%L' --unchanged-line-format=' %L'
+		fi
+                prev=$next
+        fi
+        sleep $DELAY
+done
+

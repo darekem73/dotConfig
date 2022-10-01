@@ -1,0 +1,9 @@
+#!/bin/bash
+
+TARGET=/dev/mapper/sda_crypt
+if ! [[ `lsblk -l -p -b -o NAME,TYPE,FSTYPE | egrep $TARGET` ]]; then
+        echo "Open target drive first"
+        exit 1
+fi
+
+sudo timeshift --delete --snapshot-device $TARGET

@@ -1,0 +1,66 @@
+#!/bin/bash
+
+if [[ -n "$1" ]]; then
+	case "$1"
+	in
+		"-k") 
+			kill `ps -ef | grep conky.*wttr | grep -v grep | awk '{print $2}'`
+			exit 0
+			;;
+		"--kill") 
+			kill `ps -ef | grep conky.*wttr | grep -v grep | awk '{print $2}'`
+			exit 0
+			;;
+		"-h") 
+			echo "USage: $0 <-h|-k|airport_code>"
+			exit 0
+			;;
+		"--help")
+			echo "USage: $0 <-h|-k|airport_code>"
+			exit 0
+			;;
+		*)
+			CITY="/$1"
+			;;
+	esac
+else
+	CITY=""
+fi
+
+FILE=~/.conkyrc-wttr
+CONKY="conky -c $FILE"
+COMMAND="curl wttr.in$CITY 2>/dev/null 3>&2 | sed 's/^[[[a-ln-z0-9;]*m//g;s/─/-/g;s/│/|/g'"
+
+cat > $FILE <<EOF
+conky.config = { 
+        alignment = 'bottom_left',
+        background = true,
+        color2 = '556064',
+        cpu_avg_samples = 2,
+        default_color = 'F9FAF9',
+        double_buffer = true,
+        font = 'Monospace:size=8',
+        draw_shades = false,
+        gap_x = 25, 
+        gap_y = 45, 
+        -- minimum_width = 200,
+        no_buffers = true,
+        own_window = true,
+        own_window_type = 'override',
+        own_window_transparent = true,
+        update_interval = 2.0,
+        use_xft = true,
+}
+conky.text = [[
+EOF
+
+curl wttr.in$CITY 2>/dev/null 3>&2 | sed 's/[[a-ln-z0-9;]*m//g;s/─/-/g;s/│/|/g' >> $FILE
+
+cat >> $FILE <<EOF
+]]
+EOF
+
+if [[ -z "$(ps a | grep -e "conky -c .*-wttr" | grep -v grep)" ]]; then
+	echo "Starting conky"
+	$CONKY
+fi

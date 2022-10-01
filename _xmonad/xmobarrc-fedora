@@ -1,0 +1,58 @@
+Config {
+        font = "xft:DejaVuSansMono:pixelsize=11:antialias=true:hinting=true"
+        , bgColor = "#282828"
+        , fgColor = "#ebdbb2"
+        , lowerOnStart = True
+        , sepChar = "%"
+        , alignSep = "}{"
+        -- , template = "%UnsafeStdinReader% }{ %multicoretemp% | %alsa:default:Master%/%alsa:default:Capture% | <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %eth0% | %net% | %cpu% | %memory% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>       "
+        , template = "%UnsafeStdinReader% }{ <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %eth0% | %net% | %cpu% | %memory% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>       "
+        , commands = 
+        [ 
+--            Run MultiCoreTemp ["-t", "T:<avg>°C",
+--                    "-L", "70", "-H", "90",
+--                    "-l", "green", "-n", "yellow", "-h", "red",
+--                    "--", "--mintemp", "30", "--maxtemp", "105"] 50
+           Run Network "tun1" ["-t","t:[<rx>/<tx>]"] 10
+           , Run Network "wlan0" ["-t","w:[<rx>/<tx>]"] 10
+           , Run Network "eth0" ["-t","e:[<rx>/<tx>]"] 10
+           , Run Wireless "wlan0" ["-t", "<essid> <quality>", "-L", "30", "-H", "70",
+             "-l", "red", "-n","yellow", "-h", "green"] 20
+           , Run Cpu ["-t","Cpu:<total>%","-L","3","-H","50","--normal",
+               "green","--high","red"] 20
+           , Run Memory ["-t","Mem:<usedratio>%","-L","40","-H","80"
+                 ,"-l","green","-n","orange","-h","red"] 20
+           , Run DiskU [("/", "/<free>"), ("/home", "/H:<free>")]
+                       ["-L", "20", "-H", "50", "-m", "1", "-p", "3"]
+                       100
+           , Run Date "%a %d.%m %H:%M" "date" 100
+           , Run UnsafeStdinReader
+           , Run Battery    [ "--template" , "<acstatus>"
+                            , "--Low"      , "10"        -- units: %
+                            , "--High"     , "80"        -- units: %
+                            , "--low"      , "darkred"
+                            , "--normal"   , "darkorange"
+                            , "--high"     , "darkgreen"
+                            , "--" -- battery specific options
+                                      -- discharging status
+                                      , "-o"	, "<left>% (<timeleft>)"
+                                      -- AC "on" status
+                                      -- , "-O"	, "<fc=#dAA520>Charging</fc> (<left>%)"
+                                      , "-O"	, "<fc=#dAA520>+</fc>(<left>%)"
+                                      -- charged status
+                                      -- , "-i"	, "<fc=#006000>Charged</fc>"
+                                      , "-i"	, "<fc=#006000>Full</fc>"
+                            ] 100
+--           , Run Alsa "default" "Master" ["-t", "<volume> <status>"
+--                                         , "--" 
+--                                              , "--on", "."
+--                                              , "--off", "."
+--                                         ]
+--           , Run Alsa "default" "Capture" ["-t", "<status>"
+--                                         , "--" 
+--                                              , "--on", "."
+--                                              , "--off", "."
+--                                         ]
+           , Run Com "/usr/local/bin/netdiag" [] "net" 20
+        ]
+}
