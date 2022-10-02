@@ -1,5 +1,4 @@
 {-# LANGUAGE FlexibleInstances, FlexibleContexts, MultiParamTypeClasses, NoMonomorphismRestriction #-}
-{-# OPTIONS_GHC -Wno-deprecations #-}
 import           XMonad as X                         hiding ((|||))
 import qualified XMonad.StackSet as W
 import           XMonad.Prompt
@@ -14,7 +13,6 @@ import           XMonad.Hooks.SetWMName
 import           XMonad.Hooks.UrgencyHook
 import           XMonad.Hooks.Minimize
 import           XMonad.Hooks.EwmhDesktops
-import           XMonad.Hooks.WindowSwallowing
 import           XMonad.Layout.Accordion
 import           XMonad.Layout.Fullscreen
 import           XMonad.Layout.Grid
@@ -63,15 +61,13 @@ import           XMonad.Actions.GroupNavigation
 import           XMonad.Actions.SwapPromote
 import           XMonad.Actions.Minimize
 import qualified XMonad.Actions.SwapWorkspaces as SWS
--- TODO: use submap chords
-import           XMonad.Actions.Submap
 import           Graphics.X11.ExtraTypes.XF86
 import           System.IO
 import           System.Exit
 
 --import           System.Directory
 --import           System.Process
--- import qualified Control.Exception.Extensible as E
+import qualified Control.Exception.Extensible as E
 import           XMonad.Prompt.FuzzyMatch
 
 import           Data.Maybe
@@ -81,8 +77,6 @@ import qualified Data.Map as M
 import           Data.List
 import           Data.List.Split
 import           Control.Monad
-
-defaultSpacing = 0
 
 dchoice :: [String] -> [String] -> [X()] -> X()
 dchoice args items actions = do
@@ -127,7 +121,7 @@ winCount :: X String
 winCount = gets (windowset) >>= return . show . length . W.index
 
 wsCount :: X String
-wsCount = gets (scratchpadFilterOutWorkspace . W.workspaces . windowset) >>= return . show . length
+wsCount = gets (W.workspaces . windowset) >>= return . show . length
 
 --workspaceCount :: X String
 --workspaceCount = withWindowSet $ \ws -> do return . show . length $ W.hidden ws ++ map W.workspace (W.current ws : W.visible ws)
@@ -165,7 +159,7 @@ getWindowCounts = do
 windowCountsPP :: PP -> X PP
 windowCountsPP pp = do
     counts <- getWindowCounts
-    names <- getWorkspaceNames'
+    names <- getWorkspaceNames
     return $
         pp {
               ppCurrent         = ppCurrent         pp . counts
@@ -174,11 +168,6 @@ windowCountsPP pp = do
             , ppHiddenNoWindows = ppHiddenNoWindows pp . counts
             , ppUrgent          = ppUrgent          pp . counts
         }
-
-mygetWorkspaceNames :: X (WorkspaceId -> String)
-mygetWorkspaceNames = do
-    lookup <- getWorkspaceNames'
-    return $ \wks -> wks ++ maybe "" (':' :) (lookup wks)
 
 --Makes setting the spacingRaw simpler to write. The spacingRaw module adds a configurable amount of space around windows.
 mySpacing :: Integer -> l a -> XMonad.Layout.LayoutModifier.ModifiedLayout Spacing l a
@@ -229,58 +218,58 @@ renameWS = do
     renameWorkspace' wsPromptXPConfig 
 
 -- | jump to workspace (ignores passed config)
--- wsPrompt :: XPConfig -> (String -> X ()) -> X ()
--- wsPrompt conf job = do 
---     myWorkspaces <- gets $ map W.tag . W.workspaces . windowset
---     myWorkspacesName <- getWorkspaceNames >>= \f -> return $ map (lowCase . f) myWorkspaces
---     let pairs = zip myWorkspacesName myWorkspaces
---     -- mkXPrompt (Wor "Select workspace: ") wsPromptXPConfig { autoComplete = Just 10000 }
---     mkXPrompt (Wor "Select workspace: ") wsPromptXPConfig
---               (contains myWorkspacesName)
---               (job . toWsId pairs)
---   where toWsId pairs name = case lookup name pairs of
---                                 Nothing -> ""
---                                 Just i -> i
---         contains completions input =
---             return $ filter (Data.List.isInfixOf input) completions
+wsPrompt :: XPConfig -> (String -> X ()) -> X ()
+wsPrompt conf job = do 
+    myWorkspaces <- gets $ map W.tag . W.workspaces . windowset
+    myWorkspacesName <- getWorkspaceNames >>= \f -> return $ map (lowCase . f) myWorkspaces
+    let pairs = zip myWorkspacesName myWorkspaces
+    -- mkXPrompt (Wor "Select workspace: ") wsPromptXPConfig { autoComplete = Just 10000 }
+    mkXPrompt (Wor "Select workspace: ") wsPromptXPConfig
+              (contains myWorkspacesName)
+              (job . toWsId pairs)
+  where toWsId pairs name = case lookup name pairs of
+                                Nothing -> ""
+                                Just i -> i
+        contains completions input =
+            return $ filter (Data.List.isInfixOf input) completions
 
 -- | jump to layout (ignores passed config, for now list of layouts needs to be statically defined)
--- layoutPrompt :: XPConfig -> X ()
--- layoutPrompt c = do 
---     -- ls <- gets (map (description . W.layout) . W.workspaces . windowset)
---     let ls = myLayouts
---     mkXPrompt (Wor "") wsPromptXPConfig { autoComplete = Just 10000 } (mkComplFunFromList' $ sort $ nub ls) (sendMessage . JumpToLayout)
+layoutPrompt :: XPConfig -> X ()
+layoutPrompt c = do 
+    -- ls <- gets (map (description . W.layout) . W.workspaces . windowset)
+    let ls = myLayouts
+    mkXPrompt (Wor "") wsPromptXPConfig { autoComplete = Just 10000 } (mkComplFunFromList' $ sort $ nub ls) (sendMessage . JumpToLayout)
 
 -- | Open file manager in the directory containing selected file
--- topPromptXPConfig :: XPConfig
--- topPromptXPConfig = def {
---                        font = "xft:DejaVuSansMono:pixelsize=10:antialias=true:hinting=true"
---                        , bgColor = "black"
---                        , fgColor = "gray"
---                        , borderColor = "red"
---                        , promptBorderWidth = 0
---                        , height = 18
---                        , alwaysHighlight = True
---                        , position = Top
---                        , maxComplRows = Just 10
---                        , historySize = 0
---                     }
--- getFiles :: IO [String]
--- getFiles = do
---     let getout cmd = getCommandOutput cmd `E.catch` \E.SomeException{} -> return ""
---     files <- getout "find ~/WORK/ -type f > /tmp/xmonad.find && cat /tmp/xmonad.find"
---     return $ lines $ files
--- 
--- type Predicate = String -> String -> Bool
--- 
--- getFileCompl :: [String] -> Predicate -> String -> IO [String]
--- getFileCompl compls p s | s == "" || last s == ' '  = return []
---                         | otherwise                 = return $ fuzzySort s $ filter (p s) compls
+topPromptXPConfig :: XPConfig
+topPromptXPConfig = def {
+                       font = "xft:DejaVuSansMono:pixelsize=10:antialias=true:hinting=true"
+                       , bgColor = "black"
+                       , fgColor = "gray"
+                       , borderColor = "red"
+                       , promptBorderWidth = 0
+                       , height = 18
+                       , alwaysHighlight = True
+                       , position = Top
+                       , maxComplRows = Just 10
+                       , historySize = 0
+                    }
+getFiles :: IO [String]
+getFiles = do
+    let getout cmd = getCommandOutput cmd `E.catch` \E.SomeException{} -> return ""
+    files <- getout "find ~/WORK/ -type f > /tmp/xmonad.find && cat /tmp/xmonad.find"
+    return $ lines $ files
 
--- gotoDirPrompt :: XPConfig -> X ()
--- gotoDirPrompt conf = do
---     files <- io getFiles
---     mkXPrompt (Wor "Select file: ") topPromptXPConfig (getFileCompl files $ fuzzyMatch) $ runInTerm "" . (++) "nnn " 
+type Predicate = String -> String -> Bool
+
+getFileCompl :: [String] -> Predicate -> String -> IO [String]
+getFileCompl compls p s | s == "" || last s == ' '  = return []
+                        | otherwise                 = return $ fuzzySort s $ filter (p s) compls
+
+gotoDirPrompt :: XPConfig -> X ()
+gotoDirPrompt conf = do
+    files <- io getFiles
+    mkXPrompt (Wor "Select file: ") topPromptXPConfig (getFileCompl files $ fuzzyMatch) $ runInTerm "" . (++) "nnn " 
 
 -- | Add workspace names (and later list or count of windows) to gridselectWorkspace
 mygridselectWorkspace :: GSConfig WorkspaceId ->
@@ -296,8 +285,7 @@ mygridselectWorkspace' conf func = withWindowSet $ \ws -> do
     -- counts <- getWindowCounts
     -- names <- getWorkspaceNames
     myWorkspaces <- gets $ map W.tag . W.workspaces . windowset
-    -- myWorkspacesName <- getWorkspaceNames >>= \f -> return $ map (upCase . f) myWorkspaces
-    myWorkspacesName <- mygetWorkspaceNames >>= \f -> return $ map (upCase . f) myWorkspaces
+    myWorkspacesName <- getWorkspaceNames >>= \f -> return $ map (upCase . f) myWorkspaces
     -- spawn $ "notify-send " ++ show myWorkspacesName
     -- spawn $ "notify-send " ++ show myWorkspaces
     -- spawn $ "notify-send " ++ show wss
@@ -361,9 +349,10 @@ main = do
   -- statusBar <- spawnPipe "/usr/bin/xmobar /home/darek/.xmonad/xmobarrc"
   xmonad $ docks $ withUrgencyHook NoUrgencyHook $ ewmh def {
     modMask = modMask
-    , borderWidth = 1
-    , normalBorderColor = "#404040"
+    , borderWidth = 2
+    , normalBorderColor = "#000000"
     , focusedBorderColor = "#FF0000"
+    -- , terminal = "alacritty"
     , terminal = "alacritty"
     , manageHook = composeAll [
                manageDocks
@@ -379,7 +368,7 @@ main = do
                           docksEventHook
                           , minimizeEventHook
                           , focusOnMouseMove
-                          , handleEventHook def <+> XMonad.Hooks.EwmhDesktops.fullscreenEventHook <+> swallowEventHook (className =? "Alacritty" <||> className =? "st-256color") (return True)
+                          , handleEventHook def <+> XMonad.Hooks.EwmhDesktops.fullscreenEventHook
                           , dynStatusBarEventHook barCreator barDestroyer 
                         ]
     , workspaces = myWorkspaces
@@ -393,7 +382,7 @@ main = do
                            , ppWsSep = " "
                            , ppTitle = xmobarColor "white" "#005577" . shorten 80 . wrap " " (replicate 80 ' ')
                            -- , ppSort = fmap (. scratchpadFilterOutWorkspace) $ getSortByXineramaRule     -- group by screens
-                           , ppSort = fmap (. take 9 . scratchpadFilterOutWorkspace) $ ppSort def     -- hide scratchpad from workspace list; show only 10 workspaces
+                           , ppSort = fmap (. take 9 . scratchpadFilterOutWorkspace) $ ppSort defaultPP     -- hide scratchpad from workspace list; show only 10 workspaces
                            -- , ppOrder = \(ws:l:wt:_) -> [ws,l]  -- strip active window title
                            , ppLayout = id
                            }) (def {
@@ -406,7 +395,7 @@ main = do
                                    , ppWsSep = " "
                                    , ppTitle = shorten 80 . wrap " " ""
                                    -- , ppSort = fmap (. scratchpadFilterOutWorkspace) $ getSortByXineramaRule   -- group by screens
-                                   , ppSort = fmap (.scratchpadFilterOutWorkspace) $ ppSort def      -- hide scratchpad from workspace list
+                                   , ppSort = fmap (.scratchpadFilterOutWorkspace) $ ppSort defaultPP      -- hide scratchpad from workspace list
                                    -- , ppOrder = \(ws:l:wt:_) -> [ws,l]  -- strip active window title
                                    , ppLayout = id
                                    -- }) >> updatePointer (0.05, 0.05) (0.1, 0.1) >> historyHook >> masterHistoryHook
@@ -444,10 +433,10 @@ main = do
           setWMName "LG3D"
           adjustEventInput
   } `additionalKeys` ([ 
-                       -- ((0, xK_F1), manPrompt topPromptXPConfig)
+                       ((0, xK_F1), manPrompt topPromptXPConfig)
                        -- , ((mod1Mask, xK_F1), manPrompt def)
                        -- , ((modMask, xK_grave), scratchpadSpawnActionCustom "st -n scratchpad -e /usr/local/bin/tmux-run")
-                       ((modMask, xK_grave), scratchpadSpawnActionCustom "alacritty --class scratchpad --title scratchpad -e /usr/local/bin/tmux-run")
+                       , ((modMask, xK_grave), scratchpadSpawnActionCustom "alacritty --class scratchpad --title scratchpad -e /usr/local/bin/tmux-run")
                        , ((modMask .|. controlMask, xK_l), spawn "slock")
                        -- , ((modMask, xK_Return), spawn "st")
                        -- , ((modMask .|. shiftMask, xK_Return), spawn "terminator")
@@ -455,14 +444,13 @@ main = do
                        , ((modMask, xK_v), hideWindows)
                        , ((modMask .|. shiftMask, xK_v), restoreWindows)
                        -- | set particular layout
-                       -- , ((modMask, xK_n), sendMessage (JumpToLayout "accordion"))
+                       , ((modMask, xK_n), sendMessage (JumpToLayout "accordion"))
                        , ((modMask, xK_c), sendMessage (JumpToLayout "pdock"))
                        , ((modMask, xK_f), sendMessage (JumpToLayout "full"))
-                       -- , ((modMask, xK_s), sendMessage (JumpToLayout "stack"))
+                       , ((modMask, xK_s), sendMessage (JumpToLayout "stack"))
                        , ((modMask, xK_d), sendMessage (JumpToLayout "wide"))
                        , ((modMask, xK_g), sendMessage (JumpToLayout "grid"))
-                       , ((modMask, xK_t), sendMessage (JumpToLayout "three"))
-                       -- , ((modMask, xK_t), sendMessage (JumpToLayout "float"))
+                       , ((modMask, xK_t), sendMessage (JumpToLayout "float"))
                        -- | resize windows in slave stack
                        , ((modMask, xK_z), sendMessage MirrorShrink)
                        , ((modMask, xK_a), sendMessage MirrorExpand)
@@ -473,25 +461,18 @@ main = do
                        -- | rename workspace
                        , ((mod4Mask .|. shiftMask, xK_r), renameWS)   -- TODO: will need to change for 3-monitor setup
                        -- | goto workspace with prompt
-                       -- , ((mod4Mask, xK_r), wsPrompt def (X.windows . W.greedyView))   -- TODO: will need to change with 3-monitor setup
+                       , ((mod4Mask, xK_r), wsPrompt def (X.windows . W.greedyView))   -- TODO: will need to change with 3-monitor setup
 
                        -- | begin: just for testing
                        -- , ((modMask, xK_x), curWS >>= \d->spawn $ "notify-send "++d)
                        -- , ((modMask, xK_x), winCount >>= \d->spawn $ "notify-send "++d)
                        -- , ((modMask, xK_x), getLayout >>= \d->spawn $ "notify-send "++d)
                        -- , ((modMask, xK_x), gotoDirPrompt def)
-                       -- , ((modMask .|. shiftMask, xK_m     ), layoutPrompt wsPromptXPConfig)
+                       , ((modMask .|. shiftMask, xK_m     ), layoutPrompt wsPromptXPConfig)
                        -- , ((modMask, xK_x), addWorkspacePrompt wsPromptXPConfig )
-                       , ((modMask, xK_x), submap . M.fromList $
-                           [ ((0, xK_a),     wsCount >>= \c->addWorkspace $ show ((read c) + 1)) -- add n+1 workspace
-                           -- [ ((0, xK_a),     wsCount >>= \c->addWorkspace c) -- add
-                           , ((0, xK_d),     removeWorkspace)                -- remove
-                           , ((0, xK_n),     wsCount >>= (\d->spawn $ "notify-send " ++ d) >> addWorkspacePrompt wsPromptXPConfig ) -- add named
-                           , ((0, xK_Return),     wsCount >>= (\d->spawn $ "notify-send " ++ d) ) -- show count
-                           ])
-                       -- , ((modMask .|. controlMask, xK_x), wsCount >>= \c->addWorkspace c)
-                       -- , ((modMask .|. shiftMask, xK_x), removeWorkspace)
-                       -- , ((modMask, xK_x), wsCount >>= (\d->spawn $ "notify-send " ++ show ((read d) + 1)) >> addWorkspacePrompt wsPromptXPConfig )
+                       , ((modMask .|. controlMask, xK_x), wsCount >>= \c->addWorkspace c)
+                       , ((modMask .|. shiftMask, xK_x), removeWorkspace)
+                       , ((modMask, xK_x), wsCount >>= (\d->spawn $ "notify-send " ++ show ((read d) + 1)) >> addWorkspacePrompt wsPromptXPConfig )
                        -- , ((modMask .|. controlMask, xK_x), addWorkspacePrompt wsPromptXPConfig )
                        -- , ((mod1Mask, xK_x), withFocused $ mouseResizeWindow) -- testing if in floating layout I can bring arbitrary/focused window to front
                        -- | end: just for testing
@@ -539,9 +520,9 @@ main = do
                                                                   , windowTitler = decorateName
                                                                   })
                        , ((modMask, xK_p), spawn "dmenu_run -i") -- %! Launch dmenu
-                       -- , ((mod4Mask, xK_k), spawn "kubenavmenu") -- %! Launch kubenavmenu
-                       , ((modMask, xK_s), spawn "sshmenu") -- %! Launch sshmenu
-                       , ((modMask .|. controlMask, xK_p), spawn "passmenu") -- %! Launch passmenu
+                       , ((mod4Mask, xK_k), spawn "kubenavmenu") -- %! Launch kubenavmenu
+                       , ((mod4Mask, xK_s), spawn "sshmenu") -- %! Launch sshmenu
+                       , ((mod4Mask, xK_p), spawn "passmenu") -- %! Launch passmenu
                        , ((modMask .|. shiftMask, xK_p), spawn "rofi-run")
                        , ((modMask, xK_equal), spawn "sudo backlight -inc 10")
                        , ((modMask, xK_minus), spawn "sudo backlight -dec 10")
@@ -592,14 +573,12 @@ main = do
                        , ("M-S-<R>", withFocused (keysResizeWindow (15, 0) (0, 0)))
                        , ("M-S-<L>", withFocused (keysResizeWindow (-15, 0) (0, 0)))
                        -- | Go to the next / previous workspace
-                       -- , ("M-C-<R>", nextWS)
-                       -- , ("M-C-<L>", prevWS)
-                       , ("M-C-<R>", moveTo Next nonNSP)
-                       , ("M-C-<L>", moveTo Prev nonNSP)
+                       , ("M-C-<R>", nextWS)
+                       , ("M-C-<L>", prevWS)
                        , ("M-C-<U>", swapNextScreen)
                        , ("M-C-<D>", swapPrevScreen)
                        , ("M-o", incWindowSpacing 3)
-                       , ("M-i", setScreenWindowSpacing defaultSpacing)
+                       , ("M-i", setScreenWindowSpacing 3)
                        , ("M-u", decWindowSpacing 3)
                        -- | confirm quitting       
                        , ("M-S-q", dchoice ["-p","Exit?"] ["No","Yes","Shutdown"] [(spawn "")
@@ -616,9 +595,7 @@ main = do
                        , ((modMask, 8), const $ swapNextScreen)
                      ]  
      where
-       modMask = mod1Mask -- myModMask
-       nonNSP          = WSIs (return (\ws -> W.tag ws /= "NSP"))
-       nonEmptyNonNSP  = WSIs (return (\ws -> isJust (W.stack ws) && W.tag ws /= "NSP"))
+       modMask = mod4Mask -- myModMask
        helpCommand :: X ()
        helpCommand = spawn ("echo " ++ show help ++ " | xmessage -file -")
        decorateName :: X.WindowSpace -> Window -> X String
@@ -634,17 +611,17 @@ main = do
                -- return $ (if current == W.tag ws then "*" else "") ++ "[" ++ W.tag ws ++ ":" wsname ++ "] " ++ name
 
 myLayouts = ["tall","wide","ndock","pdock","full","stack","accordion","three","grid","auto","float"]
-tall   = renamed [Replace "tall"]      $ minimize $ maximize $ spacing defaultSpacing $ ResizableTall 1 (3/100) (1/2) []
+tall   = renamed [Replace "tall"]      $ minimize $ maximize $ spacing 3 $ ResizableTall 1 (3/100) (1/2) []
 wide   = renamed [Replace "wide"]      $ Mirror $ tall
 -- dock   = renamed [Replace "dock"]      $ minimize $ maximize $ spacing 3 $ TwoPane (3/100) (1/2) -- old dock with 1 window only available in master area
-ndock  = renamed [Replace "ndock"]     $ minimize $ maximize $ spacing defaultSpacing $ NewDock 1 (3/100) (1/2)
-pdock  = renamed [Replace "pdock"]      $ minimize $ maximize $ spacing defaultSpacing $ TwoPanePersistent Nothing (3/100) (1/2)
+ndock  = renamed [Replace "ndock"]     $ minimize $ maximize $ spacing 3 $ NewDock 1 (3/100) (1/2)
+pdock  = renamed [Replace "pdock"]      $ minimize $ maximize $ spacing 3 $ TwoPanePersistent Nothing (3/100) (1/2)
 full   = renamed [Replace "full"]      $ minimize $ noBorders $ Full
-stack  = renamed [Replace "stack"]     $ minimize $ maximize $ spacing defaultSpacing $ StackTile 1 (3/100) (1/2)
-acc    = renamed [Replace "accordion"] $ minimize $ maximize $ spacing defaultSpacing $ Accordion
-three  = renamed [Replace "three"]     $ minimize $ maximize $ spacing defaultSpacing $ ThreeColMid 1 (3/100) (1/2)
-grid   = renamed [Replace "grid"]      $ minimize $ maximize $ spacing defaultSpacing $ Grid
-autom  = renamed [Replace "auto"]      $ minimize $ maximize $ spacing defaultSpacing $ Mirror $ autoMaster 1 (1/100) Grid
+stack  = renamed [Replace "stack"]     $ minimize $ maximize $ spacing 3 $ StackTile 1 (3/100) (1/2)
+acc    = renamed [Replace "accordion"] $ minimize $ maximize $ spacing 3 $ Accordion
+three  = renamed [Replace "three"]     $ minimize $ maximize $ spacing 3 $ ThreeColMid 1 (3/100) (1/2)
+grid   = renamed [Replace "grid"]      $ minimize $ maximize $ spacing 3 $ Grid
+autom  = renamed [Replace "auto"]      $ minimize $ maximize $ spacing 3 $ Mirror $ autoMaster 1 (1/100) Grid
 flt    = renamed [Replace "float"]     $ minimize $ maximize $ simplestFloat
 
 myWorkspaces = map show $ [1..9]
