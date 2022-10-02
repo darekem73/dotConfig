@@ -602,7 +602,7 @@ main = do
                        , ("M-i", setScreenWindowSpacing defaultSpacing)
                        , ("M-u", decWindowSpacing 3)
                        -- | confirm quitting       
-                       , ("M-S-q", dchoice ["-p","Exit?"] ["No","Yes","Shutdown"] [(spawn "")
+                       , ("M-S-q", dchoice ["-p","Exit?"] ["Reboot","Exit","Shutdown"] [(spawn "sudo /sbin/reboot")
                                                                                 , (io exitSuccess)
                                                                                 , (spawn "sudo /sbin/poweroff")])
                      ]
