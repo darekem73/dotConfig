@@ -1,3 +1,3 @@
 #!/bin/bash
 #rofi -show drun -font 'Monospace 9' -theme solarized
-rofi -show drun -font 'Monospace 9' -theme gruvbox-dark
+rofi -show drun -font 'Monospace 9' -theme gruvbox-dark-hard

@@ -22,12 +22,13 @@ Config {
            , Run Network "tun1" ["-t","t:[<rx>/<tx>]"] 10
            , Run Network "wlan0" ["-t","w:[<rx>/<tx>]"] 10
            , Run Network "eth0" ["-t","e:[<rx>/<tx>]"] 10
+           , Run Network "usb0" ["-t","u:[<rx>/<tx>]"] 10
            , Run Wireless "wlan0" ["-t", "<essid> <quality>", "-L", "30", "-H", "70",
              "-l", "red", "-n","yellow", "-h", "green"] 20
            , Run Cpu ["-t","Cpu:<total>%","-L","3","-H","50","--normal",
                "green","--high","red"] 20
            -- , Run CpuFreq ["-t","Freq: <cpu0>/<cpu1> GHz","-L","0","-H","2"
-           --    ,"-l","lightblue","-n","white","-h","red"] 10
+           --     ,"-l","lightblue","-n","white","-h","red"] 10
            , Run Memory ["-t","Mem:<usedratio>%","-L","40","-H","80"
                  ,"-l","green","-n","orange","-h","red"] 20
            -- , Run Swap ["-t","Swp:<usedratio>%","-L","10","-H","30"
@@ -71,6 +72,8 @@ Config {
            -- , Run Com "/usr/local/bin/getvol" [] "Vol" 10
            -- , Run Com "/usr/local/bin/gwaddress" [] "gw" 20
            , Run Com "/usr/local/bin/netdiag" [] "net" 20
+           , Run Com "/usr/local/bin/cpufreq.sh" [] "freq" 20
+	   , Run Com "/home/darek/.scripts/trayer-padding-icon.sh" [] "trayerpad" 20
        ]
        , sepChar = "%"
        , alignSep = "}{"
@@ -80,5 +83,8 @@ Config {
        -- , template = "%UnsafeStdinReader% }{ <fc=#ff66ff>%tun1%</fc> | ♫ %Vol% | ☀ %mybright% | %wlan0% | %wlan0wi% | %eth0% | %gw% | %net% | %cpu% | %memory% * %swap% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>"
        -- , template = "%StdinReader% }{ <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %eth0% | %net% | %cpu% | %memory% * %swap% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>"
        -- , template = "%UnsafeStdinReader% }{ %alsa:default:Master%/%alsa:default:Capture% | <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %eth0% | %net% | %cpu% | %memory% %swap% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>"
-       , template = "%UnsafeStdinReader% }{ %multicoretemp% | ♫ %alsa:default:Master%/%alsa:default:Capture% | <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %eth0% | %net% | %cpu% | %memory% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>       "
+       -- , template = "%UnsafeStdinReader% }{ %freq% MHz | %multicoretemp% | ♫ %alsa:default:Master%/%alsa:default:Capture% | <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %eth0% | %net% | %cpu% | %memory% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>       "
+       , template = "%UnsafeStdinReader% }{ %freq% MHz | %multicoretemp% | ♫ %alsa:default:Master%/%alsa:default:Capture% | <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %eth0% | %net% | %cpu% | %memory% | %disku% | %battery% | <fc=#ee9a00>%date%</fc> %trayerpad%"
+       -- , template = "%UnsafeStdinReader% }{ %cpufreq% | %multicoretemp% | ♫ %alsa:default:Master%/%alsa:default:Capture% | <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %eth0% | %net% | %cpu% | %memory% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>       "
+       -- , template = "%UnsafeStdinReader% }{ %multicoretemp% | ♫ %alsa:default:Master%/%alsa:default:Capture% | <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %usb0% | %net% | %cpu% | %memory% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>       "
 }

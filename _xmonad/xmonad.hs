@@ -504,8 +504,8 @@ main = do
                        , ((modMask, xK_Return), whenX (swapHybrid False) (windows $ W.swapMaster))
                        , ((modMask, xK_slash), focusUrgent)
                        -- | mirror layout like spectrwm       
-                       , ((modMask .|. shiftMask, xK_backslash), sendMessage $ Toggle REFLECTX)
-                       , ((modMask, xK_backslash), sendMessage $ Toggle REFLECTY)
+                       , ((modMask .|. shiftMask, xK_backslash), sendMessage $ Toggle REFLECTY)
+                       , ((modMask, xK_backslash), sendMessage $ Toggle REFLECTX)
                        -- | float window
                        , ((modMask .|. shiftMask, xK_f), withFocused float)
                        -- | unfloat all windows
@@ -530,11 +530,11 @@ main = do
                        -- , ((modMask .|. shiftMask, xK_g), goToSelected def)
                        , ((modMask .|. shiftMask, xK_g), mygridselectWorkspace def (\ws -> W.greedyView ws . W.shift ws) )
                        , ((modMask .|. controlMask, xK_g), mygridselectWorkspace def (\ws -> W.greedyView ws) )
-                       , ((modMask, xK_0), gotoMenuConfig WindowBringerConfig { menuCommand = "dmenu"
+                       , ((modMask, xK_0), gotoMenuConfig def { menuCommand = "dmenu"
                                                                   , XMonad.Actions.WindowBringer.menuArgs = ["-p","Goto","-i","-l","10"]
                                                                   , windowTitler = decorateName
                                                                   })
-                       , ((modMask .|. shiftMask, xK_0), bringMenuConfig WindowBringerConfig { menuCommand = "dmenu"
+                       , ((modMask .|. shiftMask, xK_0), bringMenuConfig def { menuCommand = "dmenu"
                                                                   , XMonad.Actions.WindowBringer.menuArgs = ["-p","Bring","-i","-l","10"]
                                                                   , windowTitler = decorateName
                                                                   })
@@ -626,7 +626,7 @@ main = do
        decorateName ws w = do
                name <- show <$> getName w
                current <- gets (W.currentTag . windowset)
-               getWorkspaceName (W.tag ws) >>= return . format (current) (W.tag ws) (name) . fromMaybe ""
+               getWorkspaceName (W.tag ws) >>= return . format (current) (W.tag ws) (name) . fromMaybe "" 
                where format :: WorkspaceId -> WorkspaceId -> String -> String -> String
                      -- format cur tag wn wsn = (if cur == tag then "*" else " ") ++ "[" ++ tag ++ ":" ++ pad wsn ++ "] " ++ wn
                      format cur tag wn wsn = "[" ++ tag ++ ":" ++ pad wsn ++ "]" ++ (if cur == tag then "*" else " ") ++ " " ++ wn
