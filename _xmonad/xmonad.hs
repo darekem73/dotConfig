@@ -1,7 +1,8 @@
 {-# LANGUAGE FlexibleInstances, FlexibleContexts, MultiParamTypeClasses, NoMonomorphismRestriction #-}
-{-# OPTIONS_GHC -Wno-deprecations #-}
+{-# OPTIONS_GHC -Wno-deprecations -Wno-overflowed-literals #-}
 import           XMonad as X                         hiding ((|||))
 import qualified XMonad.StackSet as W
+import           XMonad.ManageHook
 import           XMonad.Prompt
 import           XMonad.Prompt.Man
 import           XMonad.Prompt.Workspace
@@ -41,9 +42,10 @@ import           XMonad.Util.Run
 import           XMonad.Util.Dmenu
 import           XMonad.Util.Minimize
 import           XMonad.Util.NamedWindows (getName)
-import           XMonad.Util.Scratchpad
+-- import           XMonad.Util.Scratchpad
+import           XMonad.Util.NamedScratchpad
 import           XMonad.Util.SpawnOnce
-import           XMonad.Util.WorkspaceCompare
+-- import           XMonad.Util.WorkspaceCompare
 import qualified XMonad.Util.ExtensibleState as XS
 import           XMonad.Actions.AfterDrag
 import           XMonad.Actions.FindEmptyWorkspace
@@ -63,16 +65,16 @@ import           XMonad.Actions.GroupNavigation
 import           XMonad.Actions.SwapPromote
 import           XMonad.Actions.Minimize
 import qualified XMonad.Actions.SwapWorkspaces as SWS
--- TODO: use submap chords
 import           XMonad.Actions.Submap
+import           XMonad.Actions.WindowGo
 import           Graphics.X11.ExtraTypes.XF86
 import           System.IO
 import           System.Exit
 
 --import           System.Directory
 --import           System.Process
--- import qualified Control.Exception.Extensible as E
-import           XMonad.Prompt.FuzzyMatch
+--import qualified Control.Exception.Extensible as E
+--import           XMonad.Prompt.FuzzyMatch
 
 import           Data.Maybe
 import           Data.Char
@@ -127,7 +129,7 @@ winCount :: X String
 winCount = gets (windowset) >>= return . show . length . W.index
 
 wsCount :: X String
-wsCount = gets (scratchpadFilterOutWorkspace . W.workspaces . windowset) >>= return . show . length
+wsCount = gets (namedScratchpadFilterOutWorkspace . W.workspaces . windowset) >>= return . show . length
 
 --workspaceCount :: X String
 --workspaceCount = withWindowSet $ \ws -> do return . show . length $ W.hidden ws ++ map W.workspace (W.current ws : W.visible ws)
@@ -355,6 +357,19 @@ dish f r nmaster n = if n <= nmaster || nmaster == 0
     else splitVertically nmaster r1 ++ [r2] -- two columns
   where (r1,r2) = splitHorizontallyBy f r
 
+-- Window rules
+-- | Execute arbitrary actions and WindowSet manipulations when managing
+-- a new window.
+myManageHook = [ 
+                className =? "firefox" --> doShift "3"
+                , appName =? "joplin" --> doShift "8"
+                -- , title =? "Mozilla Firefox" --> doShift "3"
+                , appName =? "Mail" --> doShift "9"
+                , isInProperty "WM_NAME" "Calendar" --> doShift "9"
+                -- , title =? "Calendar" --> doShift "9"
+                -- , className =? "Firefox" --> doF W.focusDown
+            ]
+
 -- | Main program
 main = do
   -- | for signle monitor status bar
@@ -365,9 +380,11 @@ main = do
     , normalBorderColor = "#404040"
     , focusedBorderColor = "#FF0000"
     , terminal = "alacritty"
-    , manageHook = composeAll [
+    , manageHook = composeAll myManageHook <+> composeAll [
                manageDocks
-               , scratchpadManageHook $ (W.RationalRect 0.2 0.2 0.6 0.5)
+               , namedScratchpadManageHook $ myScratchpads
+               -- , scratchpadManageHook $ (W.RationalRect 0.2 0.2 0.6 0.5)
+               -- , scratchpadManageHookDefault
                , dynamicMasterHook
                , manageHook def
                ]
@@ -380,6 +397,7 @@ main = do
                           , minimizeEventHook
                           , focusOnMouseMove
                           , handleEventHook def <+> XMonad.Hooks.EwmhDesktops.fullscreenEventHook <+> swallowEventHook (className =? "Alacritty" <||> className =? "st-256color") (return True)
+                          -- , handleEventHook def <+> XMonad.Hooks.EwmhDesktops.fullscreenEventHook
                           , dynStatusBarEventHook barCreator barDestroyer 
                         ]
     , workspaces = myWorkspaces
@@ -393,7 +411,7 @@ main = do
                            , ppWsSep = " "
                            , ppTitle = xmobarColor "white" "#005577" . shorten 80 . wrap " " (replicate 80 ' ')
                            -- , ppSort = fmap (. scratchpadFilterOutWorkspace) $ getSortByXineramaRule     -- group by screens
-                           , ppSort = fmap (. take 9 . scratchpadFilterOutWorkspace) $ ppSort def     -- hide scratchpad from workspace list; show only 10 workspaces
+                           , ppSort = fmap (. take 9 . namedScratchpadFilterOutWorkspace) $ ppSort def     -- hide scratchpad from workspace list; show only 10 workspaces
                            -- , ppOrder = \(ws:l:wt:_) -> [ws,l]  -- strip active window title
                            , ppLayout = id
                            }) (def {
@@ -406,7 +424,7 @@ main = do
                                    , ppWsSep = " "
                                    , ppTitle = shorten 80 . wrap " " ""
                                    -- , ppSort = fmap (. scratchpadFilterOutWorkspace) $ getSortByXineramaRule   -- group by screens
-                                   , ppSort = fmap (.scratchpadFilterOutWorkspace) $ ppSort def      -- hide scratchpad from workspace list
+                                   , ppSort = fmap (. namedScratchpadFilterOutWorkspace) $ ppSort def      -- hide scratchpad from workspace list
                                    -- , ppOrder = \(ws:l:wt:_) -> [ws,l]  -- strip active window title
                                    , ppLayout = id
                                    -- }) >> updatePointer (0.05, 0.05) (0.1, 0.1) >> historyHook >> masterHistoryHook
@@ -429,11 +447,15 @@ main = do
     , startupHook = do
           spawnOnce "nitrogen --restore"
           -- spawnOnce "wpc &"
+          spawnOnce "tray"
           -- spawnOnce "sh -c export QT_SCALE_FACTOR=0.50"
           -- tymczasowo przyblokowane:
              -- spawnOnce "picom &"
              -- spawnOnce "conky -d -c /home/darek/.conkyrc-stat"
           spawnOnce "setxkbmap -option caps:escape"
+          spawnOnce "xm"
+          -- spawnOnce "xmodmap -e 'keycode 117=NoSymbol'"
+          -- spawnOnce "xmodmap -e 'keycode 112=NoSymbol'"
           -- spawnOnce "xautolock -time 10 -locker slock"
           -- spawnOnce "synclient TapButton2=3 TapButton1=1"
           -- spawnOnce "synclient RightButtonAreaLeft=0 RightButtonAreaTop=0"
@@ -447,7 +469,8 @@ main = do
                        -- ((0, xK_F1), manPrompt topPromptXPConfig)
                        -- , ((mod1Mask, xK_F1), manPrompt def)
                        -- , ((modMask, xK_grave), scratchpadSpawnActionCustom "st -n scratchpad -e /usr/local/bin/tmux-run")
-                       ((modMask, xK_grave), scratchpadSpawnActionCustom "alacritty --class scratchpad --title scratchpad -e /usr/local/bin/tmux-run")
+                       ((modMask, xK_grave), namedScratchpadAction myScratchpads "scratchpad")
+                       -- ((modMask, xK_grave), scratchpadSpawnActionCustom "alacritty --class scratchpad --title scratchpad -e /usr/local/bin/tmux-run")
                        , ((modMask .|. controlMask, xK_l), spawn "slock")
                        -- , ((modMask, xK_Return), spawn "st")
                        -- , ((modMask .|. shiftMask, xK_Return), spawn "terminator")
@@ -540,7 +563,7 @@ main = do
                                                                   })
                        , ((modMask, xK_p), spawn "dmenu_run -i") -- %! Launch dmenu
                        -- , ((mod4Mask, xK_k), spawn "kubenavmenu") -- %! Launch kubenavmenu
-                       , ((modMask, xK_s), spawn "sshmenu") -- %! Launch sshmenu
+                       , ((modMask .|. controlMask, xK_s), spawn "sshmenu") -- %! Launch sshmenu
                        , ((modMask .|. controlMask, xK_p), spawn "passmenu") -- %! Launch passmenu
                        , ((modMask .|. shiftMask, xK_p), spawn "rofi-run")
                        , ((modMask, xK_equal), spawn "sudo backlight -inc 10")
@@ -615,7 +638,7 @@ main = do
                        , ((modMask, 7), const $ nextWS)
                        -- | swap screens with mouse
                        , ((modMask, 8), const $ swapNextScreen)
-                     ]  
+                     ]
      where
        modMask = mod1Mask -- myModMask
        nonNSP          = WSIs (return (\ws -> W.tag ws /= "NSP"))
@@ -649,6 +672,10 @@ autom  = renamed [Replace "auto"]      $ minimize $ maximize $ spacing defaultSp
 flt    = renamed [Replace "float"]     $ minimize $ maximize $ simplestFloat
 
 myWorkspaces = map show $ [1..9]
+myScratchpads = [
+  NS "scratchpad" "alacritty --class scratchpad --title scratchpad -e /usr/local/bin/tmux-run" 
+     (stringProperty "WM_NAME" =? "scratchpad") (customFloating $ W.RationalRect 0.2 0.2 0.6 0.5)
+     ]
 
 help :: String
 help = unlines ["The default modifier key is 'alt'. Default keybindings:",

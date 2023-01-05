@@ -2,7 +2,7 @@ Config {
         -- font = "xft:Monospace:pixelsize=11"
         -- font = "xft:Monospace:pixelsize=10"
         -- font = "xft:DejaVuSansMono:pixelsize=12:antialias=true:hinting=true"
-        font = "xft:DejaVuSansMono:pixelsize=11:antialias=true:hinting=true"
+        font = "xft:DejaVuSansMono:pixelsize=10:antialias=true:hinting=true"
         -- font = "xft:DejaVuSansMono:pixelsize=10:antialias=true:hinting=true"
         -- font = "xft:FreeMono:style=Bold:pixelsize=12"
         -- font = "xft:FreeMono:style=Bold:size=10"
@@ -43,7 +43,7 @@ Config {
            , Run Battery    [ "--template" , "<acstatus>"
                             , "--Low"      , "10"        -- units: %
                             , "--High"     , "80"        -- units: %
-                            , "--low"      , "darkred"
+                            , "--low"      , "red"
                             , "--normal"   , "darkorange"
                             , "--high"     , "darkgreen"
                             , "--" -- battery specific options
