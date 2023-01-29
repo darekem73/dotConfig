@@ -41,7 +41,7 @@ import           XMonad.Util.EZConfig
 import           XMonad.Util.Run
 import           XMonad.Util.Dmenu
 import           XMonad.Util.Minimize
-import           XMonad.Util.NamedWindows (getName)
+import           XMonad.Util.NamedWindows (getName,getNameWMClass)
 -- import           XMonad.Util.Scratchpad
 import           XMonad.Util.NamedScratchpad
 import           XMonad.Util.SpawnOnce
@@ -67,6 +67,7 @@ import           XMonad.Actions.Minimize
 import qualified XMonad.Actions.SwapWorkspaces as SWS
 import           XMonad.Actions.Submap
 import           XMonad.Actions.WindowGo
+-- import           XMonad.Actions.WindowMenu
 import           Graphics.X11.ExtraTypes.XF86
 import           System.IO
 import           System.Exit
@@ -361,8 +362,8 @@ dish f r nmaster n = if n <= nmaster || nmaster == 0
 -- | Execute arbitrary actions and WindowSet manipulations when managing
 -- a new window.
 myManageHook = [ 
-                className =? "firefox" --> doShift "3"
-                , appName =? "joplin" --> doShift "8"
+                -- className =? "firefox" --> doShift "3"
+                appName =? "joplin" --> doShift "8"
                 -- , title =? "Mozilla Firefox" --> doShift "3"
                 , appName =? "Mail" --> doShift "9"
                 , isInProperty "WM_NAME" "Calendar" --> doShift "9"
@@ -453,7 +454,7 @@ main = do
              -- spawnOnce "picom &"
              -- spawnOnce "conky -d -c /home/darek/.conkyrc-stat"
           spawnOnce "setxkbmap -option caps:escape"
-          spawnOnce "xm"
+          -- spawnOnce "xm"
           -- spawnOnce "xmodmap -e 'keycode 117=NoSymbol'"
           -- spawnOnce "xmodmap -e 'keycode 112=NoSymbol'"
           -- spawnOnce "xautolock -time 10 -locker slock"
@@ -482,8 +483,9 @@ main = do
                        , ((modMask, xK_c), sendMessage (JumpToLayout "pdock"))
                        , ((modMask, xK_f), sendMessage (JumpToLayout "full"))
                        -- , ((modMask, xK_s), sendMessage (JumpToLayout "stack"))
-                       , ((modMask, xK_d), sendMessage (JumpToLayout "wide"))
-                       , ((modMask, xK_g), sendMessage (JumpToLayout "grid"))
+                       -- , ((modMask, xK_d), sendMessage (JumpToLayout "wide"))
+                       --, ((modMask, xK_g), sendMessage (JumpToLayout "grid"))
+                       , ((modMask .|. shiftMask, xK_d), dmenu myLayouts >>= (\d -> sendMessage (JumpToLayout d)))
                        , ((modMask, xK_t), sendMessage (JumpToLayout "three"))
                        -- , ((modMask, xK_t), sendMessage (JumpToLayout "float"))
                        -- | resize windows in slave stack
@@ -505,12 +507,19 @@ main = do
                        -- , ((modMask, xK_x), gotoDirPrompt def)
                        -- , ((modMask .|. shiftMask, xK_m     ), layoutPrompt wsPromptXPConfig)
                        -- , ((modMask, xK_x), addWorkspacePrompt wsPromptXPConfig )
+                       -- , ((modMask .|. controlMask, xK_x), windowMenu )
                        , ((modMask, xK_x), submap . M.fromList $
                            [ ((0, xK_a),     wsCount >>= \c->addWorkspace $ show ((read c) + 1)) -- add n+1 workspace
                            -- [ ((0, xK_a),     wsCount >>= \c->addWorkspace c) -- add
                            , ((0, xK_d),     removeWorkspace)                -- remove
                            , ((0, xK_n),     wsCount >>= (\d->spawn $ "notify-send " ++ d) >> addWorkspacePrompt wsPromptXPConfig ) -- add named
-                           , ((0, xK_Return),     wsCount >>= (\d->spawn $ "notify-send " ++ d) ) -- show count
+                           , ((0, xK_Return),     wsCount >>= (\d->spawn $ "notify-send " ++ "Workspaces: " ++ d) ) -- show count
+                           ])
+                       , ((modMask .|. shiftMask, xK_x), submap . M.fromList $
+                           [ ((0, xK_h),  namedScratchpadAction myScratchpads "htop")
+                           , ((0, xK_c),  namedScratchpadAction myScratchpads "calc")
+                           , ((0, xK_n),  namedScratchpadAction myScratchpads "qnote")
+                           , ((0, xK_Return),     spawn $ "notify-send " ++ "scratchpads h-htop\rc-calc\rn-qnote")
                            ])
                        -- , ((modMask .|. controlMask, xK_x), wsCount >>= \c->addWorkspace c)
                        -- , ((modMask .|. shiftMask, xK_x), removeWorkspace)
@@ -552,20 +561,24 @@ main = do
                        -- | navigate all open applications
                        -- , ((modMask .|. shiftMask, xK_g), goToSelected def)
                        , ((modMask .|. shiftMask, xK_g), mygridselectWorkspace def (\ws -> W.greedyView ws . W.shift ws) )
-                       , ((modMask .|. controlMask, xK_g), mygridselectWorkspace def (\ws -> W.greedyView ws) )
-                       , ((modMask, xK_0), gotoMenuConfig def { menuCommand = "dmenu"
+                       -- , ((modMask .|. controlMask, xK_g), mygridselectWorkspace def (\ws -> W.greedyView ws) )
+                       , ((modMask, xK_g), mygridselectWorkspace def (\ws -> W.greedyView ws) )
+                       , ((modMask, xK_0), gotoMenuConfig def { menuCommand = "rofi-dmenu"
                                                                   , XMonad.Actions.WindowBringer.menuArgs = ["-p","Goto","-i","-l","10"]
+                                                                  --, XMonad.Actions.WindowBringer.menuArgs = ["-show","window","-font","Monospace 9","-theme","gruvbox-dark-hard"]
+                                                                  --, XMonad.Actions.WindowBringer.menuArgs = ["window"]
                                                                   , windowTitler = decorateName
                                                                   })
-                       , ((modMask .|. shiftMask, xK_0), bringMenuConfig def { menuCommand = "dmenu"
+                       , ((modMask .|. shiftMask, xK_0), bringMenuConfig def { menuCommand = "rofi-dmenu"
                                                                   , XMonad.Actions.WindowBringer.menuArgs = ["-p","Bring","-i","-l","10"]
                                                                   , windowTitler = decorateName
                                                                   })
-                       , ((modMask, xK_p), spawn "dmenu_run -i") -- %! Launch dmenu
+                       -- , ((modMask, xK_p), spawn "dmenu_run -i") -- %! Launch dmenu
+                       , ((modMask, xK_p), spawn "rofi-run run") -- %! Launch dmenu
                        -- , ((mod4Mask, xK_k), spawn "kubenavmenu") -- %! Launch kubenavmenu
                        , ((modMask .|. controlMask, xK_s), spawn "sshmenu") -- %! Launch sshmenu
                        , ((modMask .|. controlMask, xK_p), spawn "passmenu") -- %! Launch passmenu
-                       , ((modMask .|. shiftMask, xK_p), spawn "rofi-run")
+                       , ((modMask .|. shiftMask, xK_p), spawn "rofi-run drun")
                        , ((modMask, xK_equal), spawn "sudo backlight -inc 10")
                        , ((modMask, xK_minus), spawn "sudo backlight -dec 10")
                        , ((modMask .|. shiftMask, xK_equal), spawn "amixer -D pulse sset Master 10%+")
@@ -587,8 +600,8 @@ main = do
                              , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]  -- view replaces greedyView (swapping workspaces)
                      ) 
    `additionalKeysP` [
-                       ("<XF86Explorer>", spawn "scrot -z `date +\"%Y-%m-%d_%H-%M-%S\"`-all.png && notify-send \"All screens saved\"")
-                       , ("<XF86HomePage>", spawn "scrot -u -z `date +\"%Y-%m-%d_%H-%M-%S\"`-win.png && notify-send \"Active window saved\"")
+                       ("<XF86Explorer>", spawn "scrot -z `date +\"%Y-%m-%d_%H-%M-%S\"`-all.png && notify-send -t 100 \"All screens saved\"")
+                       , ("<XF86HomePage>", spawn "scrot -u -z `date +\"%Y-%m-%d_%H-%M-%S\"`-win.png && notify-send -t 100 \"Active window saved\"")
                        -- , ("<XF86HomePage>", spawn "scrot -u -z `date +\"%Y-%m-%d_%H-%M-%S\"`-win.png")
                        -- testing only
                        -- , ("<XF86Tools>", winCount >>= \d->spawn $ "notify-send "++d )
@@ -648,6 +661,7 @@ main = do
        decorateName :: X.WindowSpace -> Window -> X String
        decorateName ws w = do
                name <- show <$> getName w
+               --name <- show <$> getNameWMClass w
                current <- gets (W.currentTag . windowset)
                getWorkspaceName (W.tag ws) >>= return . format (current) (W.tag ws) (name) . fromMaybe "" 
                where format :: WorkspaceId -> WorkspaceId -> String -> String -> String
@@ -657,12 +671,12 @@ main = do
                      pad s = concat [s, replicate (max 0 (8 - length s)) ' '] 
                -- return $ (if current == W.tag ws then "*" else "") ++ "[" ++ W.tag ws ++ ":" wsname ++ "] " ++ name
 
-myLayouts = ["tall","wide","ndock","pdock","full","stack","accordion","three","grid","auto","float"]
+myLayouts = sort $ ["tall","wide","ndock","pdock","full","stack","accordion","three","grid","auto","float"]
 tall   = renamed [Replace "tall"]      $ minimize $ maximize $ spacing defaultSpacing $ ResizableTall 1 (3/100) (1/2) []
 wide   = renamed [Replace "wide"]      $ Mirror $ tall
 -- dock   = renamed [Replace "dock"]      $ minimize $ maximize $ spacing 3 $ TwoPane (3/100) (1/2) -- old dock with 1 window only available in master area
 ndock  = renamed [Replace "ndock"]     $ minimize $ maximize $ spacing defaultSpacing $ NewDock 1 (3/100) (1/2)
-pdock  = renamed [Replace "pdock"]      $ minimize $ maximize $ spacing defaultSpacing $ TwoPanePersistent Nothing (3/100) (1/2)
+pdock  = renamed [Replace "pdock"]     $ minimize $ maximize $ spacing defaultSpacing $ TwoPanePersistent Nothing (3/100) (1/2)
 full   = renamed [Replace "full"]      $ minimize $ noBorders $ Full
 stack  = renamed [Replace "stack"]     $ minimize $ maximize $ spacing defaultSpacing $ StackTile 1 (3/100) (1/2)
 acc    = renamed [Replace "accordion"] $ minimize $ maximize $ spacing defaultSpacing $ Accordion
@@ -675,6 +689,12 @@ myWorkspaces = map show $ [1..9]
 myScratchpads = [
   NS "scratchpad" "alacritty --class scratchpad --title scratchpad -e /usr/local/bin/tmux-run" 
      (stringProperty "WM_NAME" =? "scratchpad") (customFloating $ W.RationalRect 0.2 0.2 0.6 0.5)
+  , NS "htop" "alacritty --class htop --title htop -e htop" 
+     (stringProperty "WM_NAME" =? "htop") (customFloating $ W.RationalRect 0.2 0.2 0.6 0.5)
+  , NS "calc" "alacritty --class calc --title calc -e calc" 
+     (stringProperty "WM_NAME" =? "calc") (customFloating $ W.RationalRect 0.2 0.2 0.6 0.5)
+  , NS "qnote" "alacritty --class qnote --title qnote -e vim ~/qnote-`date +\"%Y-%m-%d_%H-%M-%S\"`.txt" 
+     (stringProperty "WM_NAME" =? "qnote") (customFloating $ W.RationalRect 0.2 0.2 0.6 0.5)
      ]
 
 help :: String

@@ -5,7 +5,7 @@
 
 ## This is here so configs done via the GUI are still loaded.
 ## Remove it to not load settings done via the GUI.
-# config.load_autoconfig()
+config.load_autoconfig()
 
 ## Aliases for commands. The keys of the given dictionary are the
 ## aliases, while the values are the commands they map to.
@@ -1072,7 +1072,15 @@ c.backend = 'webengine'
 ## CSS selectors used to determine which elements on a page should have
 ## hints.
 ## Type: Dict
-# c.hints.selectors = {'all': ['a', 'area', 'textarea', 'select', 'input:not([type="hidden"])', 'button', 'frame', 'iframe', 'img', 'link', 'summary', '[onclick]', '[onmousedown]', '[role="link"]', '[role="option"]', '[role="button"]', '[ng-click]', '[ngClick]', '[data-ng-click]', '[x-ng-click]', '[tabindex]'], 'links': ['a[href]', 'area[href]', 'link[href]', '[role="link"][href]'], 'images': ['img'], 'media': ['audio', 'img', 'video'], 'url': ['[src]', '[href]'], 'inputs': ['input[type="text"]', 'input[type="date"]', 'input[type="datetime-local"]', 'input[type="email"]', 'input[type="month"]', 'input[type="number"]', 'input[type="password"]', 'input[type="search"]', 'input[type="tel"]', 'input[type="time"]', 'input[type="url"]', 'input[type="week"]', 'input:not([type])', 'textarea']}
+c.hints.selectors = {'page':
+                     ['span[class="icon-ic_right_arrow page_arrow"]'],
+                     'all': 
+                     ['a', 'area', 'textarea', 'select', 'input:not([type="hidden"])', 'button', 'frame', 'iframe', 'img', 'link', 'summary', '[onclick]', '[onmousedown]', '[role="link"]', '[role="option"]', '[role="button"]', '[ng-click]', '[ngClick]', '[data-ng-click]', '[x-ng-click]', '[tabindex]'], 
+                     'links': 
+                     ['a[href]', 'area[href]', 'link[href]', '[role="link"][href]'], 'images': ['img'], 'media': ['audio', 'img', 'video'], 
+                     'url': 
+                     ['[src]', '[href]'], 
+                     'inputs': ['input[type="text"]', 'input[type="date"]', 'input[type="datetime-local"]', 'input[type="email"]', 'input[type="month"]', 'input[type="number"]', 'input[type="password"]', 'input[type="search"]', 'input[type="tel"]', 'input[type="time"]', 'input[type="url"]', 'input[type="week"]', 'input:not([type])', 'textarea']}
 
 ## Make characters in hint strings uppercase.
 ## Type: Bool
@@ -1580,8 +1588,9 @@ c.backend = 'webengine'
 ## Page to open if :open -t/-b/-w is used without URL. Use `about:blank`
 ## for a blank page.
 ## Type: FuzzyUrl
-c.url.default_page = 'https://start.duckduckgo.com/'
-# c.url.default_page = 'https://www.startpage.com/do/mypage.pl?prfe=90eb4d4c8cea354b0dd5fdaaa0aa7d8a2a1c5d87c7bbcc0cd992f81870e8690a8a1a584c1264edaa3070c5644a0cda6285f75c931bfde1df804a529531fc5149a3ad203dcaadad911179daf6e61b635e65'
+c.url.default_page = 'about:blank'
+#c.url.default_page = 'https://start.duckduckgo.com/'
+#c.url.default_page = 'https://www.startpage.com/do/mypage.pl?prfe=90eb4d4c8cea354b0dd5fdaaa0aa7d8a2a1c5d87c7bbcc0cd992f81870e8690a8a1a584c1264edaa3070c5644a0cda6285f75c931bfde1df804a529531fc5149a3ad203dcaadad911179daf6e61b635e65'
 
 ## URL segments where `:navigate increment/decrement` will search for a
 ## number.
@@ -1613,8 +1622,9 @@ c.url.searchengines = {'DEFAULT': 'https://startpage.com/?q={}', 'dd': 'https://
 
 ## Page(s) to open at the start.
 ## Type: List of FuzzyUrl, or FuzzyUrl
-# c.url.start_pages = ['https://start.duckduckgo.com']
-c.url.start_pages = ['https://startpage.com']
+c.url.start_pages = ['https://start.duckduckgo.com']
+#c.url.start_pages = ['https://startpage.com']
+#c.url.start_pages = 'https://www.startpage.com/do/mypage.pl?prfe=90eb4d4c8cea354b0dd5fdaaa0aa7d8a2a1c5d87c7bbcc0cd992f81870e8690a8a1a584c1264edaa3070c5644a0cda6285f75c931bfde1df804a529531fc5149a3ad203dcaadad911179daf6e61b635e65'
 
 ## URL parameters to strip with `:yank url`.
 ## Type: List of String

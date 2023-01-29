@@ -2,7 +2,17 @@
 env:
   TERM: xterm-256color
 font:
-  size: 11
+  normal:
+    family: DejaVu Sans Mono
+    style: Regular
+  bold:
+    family: DejaVu Sans Mono
+    style: Bold
+  italic:
+    family: DejaVu Sans Mono
+    style: Italic
+  size: 8
+  use_thin_strokes: true
 mouse:
   hide_when_typing: true
 window:
@@ -31,7 +41,7 @@ key_bindings:
   action: SpawnNewInstance
 selection:
   semantic_escape_chars: ",│`|:\"' ()[]{}<>\t"
-  save_to_clipboard: true
+  save_to_clipboard: false
 colors:
   primary:
     background: "#282828"

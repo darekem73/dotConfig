@@ -1,3 +1,7 @@
 #!/bin/bash
-#rofi -show drun -font 'Monospace 9' -theme solarized
-rofi -show drun -font 'Monospace 9' -theme gruvbox-dark-hard
+if [ -z "$1" ]; then 
+	mode=drun
+else
+	mode=$1
+fi
+rofi -modi "run,drun,window,windowcd" -show "$mode" -font 'Monospace 9' -theme gruvbox-dark-hard

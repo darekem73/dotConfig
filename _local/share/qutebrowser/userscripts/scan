@@ -1,0 +1,206 @@
+#!/bin/bash
+
+_TITLE=`echo "$QUTE_URL" | awk '{split($0,tab,"/"); title=tab[length(tab)]; sub(/#/,"",title); print title}'`
+TITLE=`echo $_TITLE | sed -r 's/\ +/_/g'`
+[ -n "$TITLE" ] && LOG="/tmp/scanlog-$$-$TITLE.log" || LOG=/tmp/scanlog.$$
+
+#LOG=/tmp/scanlog.log
+
+: > $LOG
+NUM_PAGES=`cat "$QUTE_TEXT" | awk '/^PAGE [0-9]+ OF [0-9]+/ {print $NF}'`
+INIT_PAGE=1
+[ $# -eq 1 ] && INIT_PAGE=$1
+
+random() {
+	local _mul="$1"
+	[ -z "$1" ] && _mul=1
+	r=$(( $RANDOM % 20000 + 10000 ))
+	(( r=$r*$_mul/100 ))
+	echo "0."$r
+}
+
+sleep_random() {
+	local _mul=$1
+	[ -z "$1" ] && _mul=1
+	local _time=$(random $_mul)
+	log "Random sleep: $_time"
+	sleep $_time
+}
+
+notify() {
+	notify-send -t $1 -u $2 "$3"
+}
+
+
+log() {
+	echo "$1" >> $LOG
+}
+
+#function notify() {
+#	notify-send "$1"
+#}
+
+#function scan_page() {
+#	FILE_NAME="/tmp/`date +"%Y-%m-%d_%H-%M-%S"`-"$TITLE"-$1.png"
+#	echo "screenshot --force $FILE_NAME" >> "$QUTE_FIFO"
+#	notify "Scanned $1"
+#	#scrot -u -z `date +"%Y-%m-%d_%H-%M-%S"`-"$TITLE".png && notify "Page ($1/$NUM_PAGES)"
+#}
+
+filename() {
+	local _title="$1"
+	local _page="$2"
+	echo "/tmp/`date +"%Y-%m-%d_%H-%M-%S"`-"$_title"-$_page.png"
+}
+
+size_of() {
+	local _filename="$1"
+	echo $(find $_filename -printf "%s")
+}
+
+compare() {
+	log "Comparing: $1 $2"
+	res=`cmp "$1" "$2" >/dev/null && echo same  || echo diff`
+	log "$res"
+	echo $res
+}
+
+scan() {
+	local _filename="$1"
+	log "Scanning: $_filename"
+	echo "screenshot --force $_filename" >> "$QUTE_FIFO"
+	sleep_random 1
+	last_size=$(size_of "$_filename")
+	log "File size (1): $last_size"
+	sleep_random 1
+	next_size=$(size_of "$_filename")
+	log "File size (2): $next_size"
+	while [ $last_size -ne $next_size ]; do
+		log "File sizes differ: $last_size $next_size"
+		last_size=$next_size
+		sleep_random 1
+		next_size=$(size_of "$_filename")
+		log "File size (2): $next_size"
+	done
+}
+
+robust_scan() {
+	local _filename="$1"
+	local prev=/tmp/1.png
+	local next=/tmp/2.png
+	#[ -f $prev ] && rm -f $prev
+	#[ -f $next ] && rm -f $next
+	log "scan $prev"
+	scan "$prev"
+	sleep_random 3
+	sleep_random 3
+	log "scan $next"
+	scan "$next"
+	while [[ "$(compare "$prev" "$next")" == "diff" ]]; do
+		log "SIZE: `size_of "$prev"` `size_of "$next"`"
+		log "MD5: `md5sum "$prev"` `md5sum "$next"`"
+		cp $next $prev
+		sleep_random 3
+		sleep_random 3
+		log "repeating scan to: $next"
+		scan "$next"
+	done
+	log "moving robust_scan to $_filename"
+	cp "$next" "$_filename"
+	#[ -f $prev ] && rm -f $prev
+	#[ -f $next ] && rm -f $next
+}
+
+next_page() {
+	echo "hint page" >> "$QUTE_FIFO"
+	sleep_random 1
+	echo "hint-follow a" >> "$QUTE_FIFO"
+}
+
+#function is_last_page() {
+#	FOUND=0
+#	echo "" | xsel -b -i
+#	echo "search review" >> "$QUTE_FIFO"
+#	echo "fake-key -g vy" >> "$QUTE_FIFO"
+#	echo "fake-key -g <Escape>" >> "$QUTE_FIFO"
+#	sleep 0.2
+#	if [ `xsel -b -o | egrep -i "review" 2>/dev/null` ]; then
+#		log "last page found"
+#		FOUND=1
+#		sleep 0.1
+#		xsel -c -b
+#	fi
+#	echo $FOUND
+#}
+
+#function last_resort() {
+#	# sprawdzic czy dwa ostatnie pliki sa takie same?
+#}
+
+if [ -z "$NUM_PAGES" ] || [ -z "$TITLE" ]; then
+	log "Not a book: $TITLE ($NUM_PAGES pages)"
+	notify 1000 critical "Not a book?"
+	exit 1
+fi
+
+cdown=3
+while [ $cdown -gt 0 ]; do
+	notify 700 low "$cdown"
+	(( cdown=$cdown-1 ))
+	sleep 1
+done
+
+log "START: $TITLE ($NUM_PAGES pages)"
+notify 1000 normal "Scanning started (pages: $NUM_PAGES)"
+(( guard=$NUM_PAGES*3 ))
+log "Initial page number: $INIT_PAGE"
+count=$INIT_PAGE
+#CONTINUE=1
+#while [ $CONTINUE -eq 1 ]; do
+#	scan_page $count
+#	result=$(is_last_page)
+#	[ "$(is_last_page)" -eq 0 ] && next_page || break
+#	[ $count -ge $guard ] && log "BREAKING" && break
+#	log "$count/$guard"
+#	(( count=$count+1 ))
+#done
+#echo "Scanning"
+last=
+while true; do
+	next=$(filename "$TITLE" $count)
+	log "Robust scan to: $next"
+	robust_scan "$next"
+	notify 700 low "Scanned page: $count/$NUM_PAGES"
+	(( count=$count+1 ))
+	#if [ $count -gt 10 ]; then
+	#       break
+	#fi
+	if [ -z "$last" ]; then
+		log "First time priming $next for comparison with next page"
+		last=$next
+	else
+		log "Comparing files: $last $next for potential end of book"
+		if [[ "$(compare "$last" "$next")" == "same" ]]; then
+			log "Same page robust_scanned; last?"
+			notify 100 critical "WARNING: Check if scanning finished"
+			break
+		else
+			log "Priming $next for comparison with next page"
+			last=$next
+		fi
+	fi
+	sleep_random 2
+	log "Next page: $count"
+	next_page
+	sleep_random 3
+	sleep_random 3
+	(( guard=$guard-1 ))
+	if [ $guard -le 0 ]; then
+		log "BREAKING due to guard"
+		notify 100 critical "ERROR: Guard reached"
+		exit 1
+	fi
+done
+notify 2000 normal "Scanning finished"
+log "END: $TITLE ($count pages)"
+exit 0

@@ -1,0 +1,2 @@
+#!/bin/bash
+rofi -dmenu -font 'Monospace 9' -theme gruvbox-dark-hard $@ --
