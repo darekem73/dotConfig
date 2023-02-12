@@ -473,8 +473,8 @@ main = do
                        ((modMask, xK_grave), namedScratchpadAction myScratchpads "scratchpad")
                        -- ((modMask, xK_grave), scratchpadSpawnActionCustom "alacritty --class scratchpad --title scratchpad -e /usr/local/bin/tmux-run")
                        , ((modMask .|. controlMask, xK_l), spawn "slock")
-                       -- , ((modMask, xK_Return), spawn "st")
-                       -- , ((modMask .|. shiftMask, xK_Return), spawn "terminator")
+                       , ((mod4Mask, xK_Return), spawn "st")
+                       , ((mod4Mask .|. shiftMask, xK_Return), spawn "terminator")
                        -- | hide and restore windows on current workspace
                        , ((modMask, xK_v), hideWindows)
                        , ((modMask .|. shiftMask, xK_v), restoreWindows)
