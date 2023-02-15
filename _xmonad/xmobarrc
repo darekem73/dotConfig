@@ -5,7 +5,13 @@ Config {
         -- font = "xft:DejaVuSansMono:pixelsize=10:antialias=true:hinting=true"
         -- font = "xft:Sans Mono 8"
         -- font = "xft:DejaVu Sans Mono 8"
-        font = "xft:Noto Mono 8"
+
+        -- font = "xft:Noto Mono 8"
+        -- font = "xft:DejaVu Sans Mono 8"
+        font = "xft:JetBrains Mono 8"
+        -- font = "xft:Ubuntu Mono 9"
+        -- font = "xft:Hack 8"
+
         -- font = "xft:Noto Sans Mono 8"
         -- font = "xft:Liberation Mono 8"
         -- font = "xft:Free Mono 9"
