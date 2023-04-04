@@ -16,6 +16,7 @@ HISTCONTROL=ignoreboth
 shopt -s histappend
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+export PROMPT_COMMAND='history -a'
 export HISTTIMEFORMAT='%F %T '
 #HISTSIZE=1000
 HISTCONTROL=ignoredups
@@ -136,19 +137,8 @@ fi
 
 export NNN_EDITOR=vim
 export NNN_PLUG='f:fzcd;o:fzopen;h:fzhist;i:imgview;r:dragdrop;b:bookmarks;d:diffs;l:launch;u:dups;w:wdiffs'
-#xterm-256color
 #export NNN_COLORS='#04050a0d;1234'
 export NNN_COLORS='#04010203;1234'
-export NNN_COLORS='#04020301;1234'
-#xterm-color
-#export NNN_COLORS='6125'
-#export NNN_COLORS='4231'
-#OneDark
-#BLK="04" CHR="04" DIR="04" EXE="00" REG="00" HARDLINK="00" SYMLINK="06" MISSING="00" ORPHAN="01" FIFO="0F" SOCK="0F" OTHER="02"
-#export NNN_FCOLORS="$BLK$CHR$DIR$EXE$REG$HARDLINK$SYMLINK$MISSING$ORPHAN$FIFO$SOCK$OTHER"
-#Nord
-#BLK="0B" CHR="0B" DIR="04" EXE="06" REG="00" HARDLINK="06" SYMLINK="06" MISSING="00" ORPHAN="09" FIFO="06" SOCK="0B" OTHER="06"
-#export NNN_FCOLORS="$BLK$CHR$DIR$EXE$REG$HARDLINK$SYMLINK$MISSING$ORPHAN$FIFO$SOCK$OTHER"
 export NNN_FCOLORS='c1e2272e006033f7c6d6abc4'
 export BOOKMARKS_DIR=/home/darek/.config/nnn/bookmarks
 #Order 	Hex 	Color
@@ -185,7 +175,7 @@ n()
     fi
 }
 
-PATH="$( find $HOME/.scripts/ -type d -printf ":%p" )${PATH:+:${PATH}}"; export PATH;
+PATH="$( find $HOME/.scripts -type d -printf ":%p" )${PATH:+:${PATH}}"; export PATH;
 #PATH="/home/darek/perl5/bin${PATH:+:${PATH}}"; export PATH;
 #PERL5LIB="/home/darek/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
 #PERL_LOCAL_LIB_ROOT="/home/darek/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;

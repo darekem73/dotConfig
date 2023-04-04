@@ -485,7 +485,7 @@ main = do
                        -- , ((modMask, xK_s), sendMessage (JumpToLayout "stack"))
                        -- , ((modMask, xK_d), sendMessage (JumpToLayout "wide"))
                        --, ((modMask, xK_g), sendMessage (JumpToLayout "grid"))
-                       , ((modMask .|. shiftMask, xK_d), dmenu myLayouts >>= (\d -> sendMessage (JumpToLayout d)))
+                       , ((mod4Mask .|. shiftMask, xK_d), dmenu myLayouts >>= (\d -> sendMessage (JumpToLayout d)))
                        , ((modMask, xK_t), sendMessage (JumpToLayout "three"))
                        -- , ((modMask, xK_t), sendMessage (JumpToLayout "float"))
                        -- | resize windows in slave stack

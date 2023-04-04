@@ -1,0 +1,287 @@
+/* On macos, the titlebar has to be made high enough */
+#titlebar {
+ height: 44px;
+}
+
+#navigation-toolbox, #tabmail-tabs,  #tabmail-arrowscrollbox{ /* Outer tab containers */
+    min-height: 44px !important;
+ }
+ 
+.tabmail-tab { /* Give the tabs a bit of a margin */
+    margin: 4px !important;
+}
+ 
+.tab-background { /* Round tab corners and add a bit of padding */
+    padding: 6px;
+    border-radius: 4px;
+}
+ 
+.tab-line { /* Eliminate the line at the top of the tab */
+    height: 0px !important;
+    display: none !important;
+}
+
+.tabmail-tab::after, .tabmail-tab::before { /* Eliminate the line between inactive tabs */
+    border: none !important;
+}
+
+.toolbarbutton-1, .searchBox, .themeableSearchBox { /* Eliminate borders, round corners, and increase height on buttons and search bars */
+    border: none !important;
+    border-radius: 5px !important;
+    height: 31px !important;
+}
+
+.contentTabUrlInput {
+    height: 26px !important;
+}
+
+.panel-arrowbox { /* hide the arrow on popup menus */
+    display: none;
+}
+
+.panel-arrowcontent { /* Eliminate borders, round corners, and increase padding on popup menus */
+    padding: 5px !important;
+    border-radius: 5px;
+    border: none;
+}
+
+.spaces-toolbar:not([hidden]) {
+    margin-top: -44px !important;
+}
+
+.tab-background[selected="true"] {
+    box-shadow: var(--tab-shadow) !important;
+}
+
+.tabmail-tab:hover .tab-background:not([selected="true"]) {
+    background-color: color-mix(in srgb, currentColor 11%, transparent) !important;
+}
+
+@media (-moz-content-prefers-color-scheme:light) {
+  /* Light Theme */
+    :root {
+        --tab-shadow: 0px 0px 4px #888;
+        --toolbar-field-background-color: rgb(230, 230, 234) !important;
+  }
+}
+
+@media (-moz-content-prefers-color-scheme:dark) {
+  /* Dark Theme */
+  :root {
+    --tab-shadow: 0px 0px 4px #111 !important;
+    --toolbar-field-background-color: rgb(28, 27, 34) !important;
+  }
+}
+
+.tab-close-button {
+    padding: 6px !important;
+}
+
+.tab-close-icon {
+    width: 12px !important;
+    height: 12px !important;
+}
+
+.contentTabToolbar {
+    height: 40px !important;
+}
+
+#urlbar-background {
+    border: none;
+    box-shadow: none !important;
+}
+
+/* Set preference toolkit.legacyUserProfileCustomizations.stylesheets to true !! */
+
+/* colour for even numbered rows */
+treechildren::-moz-tree-row(even) {
+  background-image: linear-gradient(rgba(0,0,0,.08), rgba(0,0,0,.08)) !important;  /* Highlight, complication for tagged rows */
+}
+
+/* needed for TB 102 since there they style selected stuff in white which doesn't look good on light blue */
+#threadTree treechildren::-moz-tree-cell-text(untagged) {
+  color: black !important;
+}
+#threadTree treechildren::-moz-tree-image(selected, untagged) {
+  stroke: black !important;
+  fill: #bbb !important;
+}
+#threadTree treechildren::-moz-tree-twisty(selected, untagged) {
+  stroke: black !important;
+  fill: black !important;
+}
+#threadTree treechildren::-moz-tree-line(selected, untagged) {
+  border-color: black !important;
+}
+#threadTree treechildren::-moz-tree-cell-text(multiline, untagged) {
+  color: rgb(0, 114, 198) !important;
+}
+#threadTree treechildren::-moz-tree-cell-text(multiline, colspan, untagged) {
+  color: black !important;
+}
+
+/* previously selected item, now deselected */
+#threadTree treechildren::-moz-tree-row(untagged, selected) {
+  border: none !important;  /* needed so suppress 'native' selection border */
+  background-color: #c0d0ff !important;  /* Highlight */
+}
+
+#threadTree treechildren::-moz-tree-row(untagged, selected, focus) {
+  /* Original TB colour cde8ff + three steps darker in GIMP. */
+  background-color: #c4dff6 !important;  /* Highlight */
+}
+
+#threadTree treechildren::-moz-tree-row(untagged, hover) {
+  /* Original TB colour cde8ff + four steps lighter in GIMP. */
+  background-color: #d8f3ff !important;  /* very pale blue */
+}
+
+#threadTree treechildren::-moz-tree-row(untagged, selected, focus, hover) {
+  /* Original TB colour cde8ff. */
+  background-color: #cde8ff !important;  /* Highlight, but lighter */
+}
+
+#threadTree treechildren::-moz-tree-cell(dropOn) {
+  background-image: none !important;     /* needed so target background is solid */
+  background-color: #ff8080 !important;
+}
+
+/* -- Multi-line stuff -- */
+#threadTree treechildren::-moz-tree-cell-text(multiline, colspan) {
+  font-style: normal !important;
+}
+
+#threadTree treechildren::-moz-tree-row(multiline, unread) {
+  border-left: 2px solid rgb(0, 114, 198) !important;
+  /* background-color: rgba(0, 114, 198, 0.1) !important; */
+}
+
+:root[uidensity="compact"] treechildren::-moz-tree-row(multiline) {
+  margin-top: -1px !important;
+  min-height: 2.4rem !important;
+  height: 2.4rem !important;
+}
+:root[uidensity="compact"] treechildren::-moz-tree-colspan {
+  margin-top: 1.2rem !important;
+}
+:root[uidensity="compact"] treechildren::-moz-tree-cell(multiline) {
+  min-height: 1.2rem !important;
+  height: 1.2rem !important;
+}
+
+/* This is in the product, but the rules above destroy it, so repeat it here */
+#threadTree treechildren::-moz-tree-cell(multiline, dummy) {
+  height: 0 !important;
+}
+#threadTree treechildren::-moz-tree-colspan(multiline, dummy) {
+  margin-top: 0 !important;
+}
+
+#threadTree treechildren::-moz-tree-row(multiline, dummy) {
+  background-color: lightblue !important;
+}
+
+/* -- Folder tree -- */
+#folderTree treechildren::-moz-tree-image(folderNameCol, selected, focus),
+#folderTree treechildren::-moz-tree-image(folderNameCol, newMessages-true, selected, focus),
+#folderTree treechildren::-moz-tree-image(folderNameCol, isServer-true, biffState-NewMail, selected, focus) {
+  stroke: red !important;
+  fill: orange !important;
+}
+#folderTree {
+  --primary-stroke: #196f3d !important;
+  --primary-fill: #76c78e !important;
+}
+
+/* needed for TB 102 since there they style selected stuff in white which doesn't look good on light blue */
+#folderTree treechildren::-moz-tree-cell-text(selected) {
+  color: black !important;
+}
+#folderTree treechildren::-moz-tree-twisty(selected) {
+  stroke: black !important;
+  fill: black !important;
+}
+
+/* previously selected item, now deselected */
+#folderTree treechildren::-moz-tree-row(selected) {
+  border: none !important;  /* needed so suppress 'native' selection border */
+  background-color: #c0d0ff !important;  /* Highlight */
+}
+
+#folderTree treechildren::-moz-tree-row(selected, focus) {
+  /* Original TB colour cde8ff + three steps darker in GIMP. */
+  background-color: #c4dff6 !important;  /* Highlight */
+}
+
+#folderTree treechildren::-moz-tree-row(hover) {
+  /* Original TB colour cde8ff + four steps lighter in GIMP. */
+  background-color: #d8f3ff !important;  /* very pale blue */
+}
+
+#folderTree treechildren::-moz-tree-row(selected, focus, hover) {
+  /* Original TB colour cde8ff. */
+  background-color: #cde8ff !important;  /* Highlight, but lighter */
+}
+
+#folderTree treechildren::-moz-tree-cell(dropOn) {
+  background-image: none !important;     /* needed so target background is solid */
+  background-color: #ff8080 !important;
+}
+
+/* -- Other misc. stuff -- */
+#hdrArchiveButton { display: none; }
+#hdrJunkButton { display: none; }
+
+.autocomplete-richlistitem:hover {
+  background-color: #ff8080 !important;
+}
+
+#threadTree[filterActive="searching"] {
+  background-color: #ffffcc !important;
+}
+
+#threadTree[filterActive="matches"] {
+    background-color: #f0ffff ! important;
+}
+
+#threadTree[filterActive="nomatches"] {
+  background: repeating-linear-gradient(-45deg, #fff0f4,
+              #fff0f4 5px, white 5px, white 10px) !important;
+}
+
+/* Crazy multi-line stuff
+#threadTree treechildren::-moz-tree-cell-text(multiline, dummy) {
+  color: red !important;
+}
+#threadTree treechildren::-moz-tree-twisty(multiline, dummy) {
+  stroke: red !important;
+  fill: red !important;
+}
+
+#threadTree treechildren::-moz-tree-row(multiline, unread) {
+  border-left: 3px solid #0080C0 !important;
+  background-color: rgba(0, 128, 192, 0.1) !important;
+}
+#threadTree treechildren::-moz-tree-cell-text(multiline) {
+  font-size: 15px;
+}
+#threadTree treechildren::-moz-tree-cell-text(multiline, colspan) {
+  font-size: 12px;
+}
+
+#threadTree treechildren::-moz-tree-cell-text(colspan) {
+  border: 1px solid red !important;
+}
+#threadTree treechildren::-moz-tree-cell-text(correspondentCol) {
+  border: 1px solid green !important;
+}
+#threadTree treechildren::-moz-tree-cell-text(senderCol) {
+  border: 1px solid green !important;
+}
+#threadTree treechildren::-moz-tree-cell-text(recipientCol) {
+  border: 1px solid green !important;
+}
+#threadTree treechildren::-moz-tree-cell-text(dateCol) {
+  border: 1px solid yellow !important;
+}
+*/
