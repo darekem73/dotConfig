@@ -27,6 +27,7 @@ import           XMonad.Layout.Renamed
 import           XMonad.Layout.TwoPanePersistent
 import           XMonad.Layout.ResizableTile     -- Resizable Horizontal border
 import           XMonad.Layout.ThreeColumns
+import           XMonad.Layout.MultiColumns
 import           XMonad.Layout.StackTile
 import           XMonad.Layout.Reflect
 import           XMonad.Layout.MultiToggle
@@ -391,8 +392,7 @@ main = do
                ]
     , layoutHook = mkToggle (single REFLECTX) $
                    mkToggle (single REFLECTY) $
-                   avoidStruts $ 
-                   tall ||| wide ||| pdock ||| ndock ||| full ||| three ||| grid ||| acc ||| stack ||| autom ||| flt
+                   avoidStruts $ myLayoutHook 
     , handleEventHook = mconcat [
                           docksEventHook
                           , minimizeEventHook
@@ -503,7 +503,7 @@ main = do
                        -- | begin: just for testing
                        -- , ((modMask, xK_x), curWS >>= \d->spawn $ "notify-send "++d)
                        -- , ((modMask, xK_x), winCount >>= \d->spawn $ "notify-send "++d)
-                       -- , ((modMask, xK_x), getLayout >>= \d->spawn $ "notify-send "++d)
+                       -- , ((modMask .|. shiftMask, xK_m), getLayout >>= \d->spawn $ "notify-send "++d)
                        -- , ((modMask, xK_x), gotoDirPrompt def)
                        -- , ((modMask .|. shiftMask, xK_m     ), layoutPrompt wsPromptXPConfig)
                        -- , ((modMask, xK_x), addWorkspacePrompt wsPromptXPConfig )
@@ -671,9 +671,11 @@ main = do
                      pad s = concat [s, replicate (max 0 (8 - length s)) ' '] 
                -- return $ (if current == W.tag ws then "*" else "") ++ "[" ++ W.tag ws ++ ":" wsname ++ "] " ++ name
 
-myLayouts = sort $ ["tall","wide","ndock","pdock","full","stack","accordion","three","grid","auto","float"]
+myLayouts    = sort $ ["tall","wide","ndock","pdock","full","stack","accordion","three","cols","grid","auto","float"]
+myLayoutHook = tall ||| wide ||| pdock ||| ndock ||| full ||| three ||| cols ||| grid ||| acc ||| stack ||| autom ||| flt
 tall   = renamed [Replace "tall"]      $ minimize $ maximize $ spacing defaultSpacing $ ResizableTall 1 (3/100) (1/2) []
 wide   = renamed [Replace "wide"]      $ Mirror $ tall
+cols   = renamed [Replace "cols"]      $ minimize $ maximize $ spacing defaultSpacing $ multiCol [1] 1 0.01 0.25
 -- dock   = renamed [Replace "dock"]      $ minimize $ maximize $ spacing 3 $ TwoPane (3/100) (1/2) -- old dock with 1 window only available in master area
 ndock  = renamed [Replace "ndock"]     $ minimize $ maximize $ spacing defaultSpacing $ NewDock 1 (3/100) (1/2)
 pdock  = renamed [Replace "pdock"]     $ minimize $ maximize $ spacing defaultSpacing $ TwoPanePersistent Nothing (3/100) (1/2)
