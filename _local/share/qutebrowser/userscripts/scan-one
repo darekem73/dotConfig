@@ -106,9 +106,14 @@ robust_scan() {
 }
 
 next_page() {
+	log "Entering hint page mode"
 	echo "hint page" >> "$QUTE_FIFO"
-	sleep_random 1
+	log "Short nap"
+	sleep_random 3
+	sleep_random 3
+	log "Following hint"
 	echo "hint-follow a" >> "$QUTE_FIFO"
+	log "Followed hint"
 }
 
 if [ -z "$NUM_PAGES" ] || [ -z "$TITLE" ]; then

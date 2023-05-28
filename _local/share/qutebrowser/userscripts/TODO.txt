@@ -1,0 +1,1 @@
+Change /tmp to a /home based directory for scans
