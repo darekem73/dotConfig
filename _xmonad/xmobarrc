@@ -87,7 +87,7 @@ Config {
            , Run Com "/usr/local/bin/cpufreq.sh" [] "freq" 20
 	   , Run Com "/home/darek/.scripts/trayer-padding-icon.sh" [] "trayerpad" 20
            , Run Com "/bin/bash" ["-c", "echo -n `vboxmanage list runningvms | awk '{print $1}' | grep -oE '[a-zA-Z0-9]+'`"] "vms" 20
-           , Run Com "/bin/bash" ["-c", "echo -n `bluetoothctl devices | wc -l`"] "bt" 20
+           , Run Com "/bin/bash" ["-c", "echo -n `bluetoothctl devices Connected | wc -l`"] "bt" 20
        ]
        , sepChar = "%"
        , alignSep = "}{"
