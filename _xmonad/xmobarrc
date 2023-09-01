@@ -87,6 +87,7 @@ Config {
            , Run Com "/usr/local/bin/cpufreq.sh" [] "freq" 20
 	   , Run Com "/home/darek/.scripts/trayer-padding-icon.sh" [] "trayerpad" 20
            , Run Com "/bin/bash" ["-c", "echo -n `vboxmanage list runningvms | awk '{print $1}' | grep -oE '[a-zA-Z0-9]+'`"] "vms" 20
+           , Run Com "/bin/bash" ["-c", "echo -n `bluetoothctl devices | wc -l`"] "bt" 20
        ]
        , sepChar = "%"
        , alignSep = "}{"
@@ -97,7 +98,7 @@ Config {
        -- , template = "%StdinReader% }{ <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %eth0% | %net% | %cpu% | %memory% * %swap% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>"
        -- , template = "%UnsafeStdinReader% }{ %alsa:default:Master%/%alsa:default:Capture% | <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %eth0% | %net% | %cpu% | %memory% %swap% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>"
        -- , template = "%UnsafeStdinReader% }{ %freq% MHz | %multicoretemp% | ♫ %alsa:default:Master%/%alsa:default:Capture% | <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %eth0% | %net% | %cpu% | %memory% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>       "
-       , template = "%UnsafeStdinReader% }{ <fc=#ff66ff>VMs: %vms%</fc> | %freq% MHz | %multicoretemp% | ♫ %alsa:default:Master%/%alsa:default:Capture% | <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %eth1% | %net% | %cpu% | %memory% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>%trayerpad%"
+       , template = "%UnsafeStdinReader% }{ bt: %bt% | <fc=#ff66ff>%vms%</fc> | %freq% MHz | %multicoretemp% | ♫ %alsa:default:Master%/%alsa:default:Capture% | <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %eth1% | %net% | %cpu% | %memory% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>%trayerpad%"
        -- , template = "<icon=/tmp/haskell.xpm /> %UnsafeStdinReader% }{ %freq% MHz | %multicoretemp% | ♫ %alsa:default:Master%/%alsa:default:Capture% | <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %eth0% | %net% | %cpu% | %memory% | %disku% | %battery% | <fc=#ee9a00>%date%</fc> %trayerpad%"
        -- , template = "%UnsafeStdinReader% }{ %cpufreq% | %multicoretemp% | ♫ %alsa:default:Master%/%alsa:default:Capture% | <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %eth0% | %net% | %cpu% | %memory% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>       "
        -- , template = "%UnsafeStdinReader% }{ %multicoretemp% | ♫ %alsa:default:Master%/%alsa:default:Capture% | <fc=#ff66ff>%tun1%</fc> | %wlan0% | %wlan0wi% | %usb0% | %net% | %cpu% | %memory% | %disku% | %battery% | <fc=#ee9a00>%date%</fc>       "
